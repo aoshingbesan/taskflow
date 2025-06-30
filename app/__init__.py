@@ -8,6 +8,7 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 migrate = Migrate()
 
+
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
@@ -18,8 +19,8 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
 
     # Configure login manager
-    login_manager.login_view = 'auth.login'
-    login_manager.login_message = 'Please log in to access this page.'
+    login_manager.login_view = "auth.login"
+    login_manager.login_message = "Please log in to access this page."
 
     # Register blueprints
     from app.routes.auth import auth_bp
@@ -30,4 +31,4 @@ def create_app(config_class=Config):
     app.register_blueprint(tasks_bp)
     app.register_blueprint(main_bp)
 
-    return app 
+    return app
