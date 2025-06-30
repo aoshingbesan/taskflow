@@ -42,6 +42,10 @@ jobs:
       run: |
         black --check --diff app/ tests/
     
+    - name: Run simple tests first
+      run: |
+        python test_simple.py
+        
     - name: Run tests with pytest
       env:
         DATABASE_URL: sqlite:///test.db
