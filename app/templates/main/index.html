@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}TaskFlow - Personal Task Management{% endblock %}
+
+{% block content %}
+<div class="row align-items-center min-vh-75">
+    <div class="col-lg-6">
+        <h1 class="display-4 fw-bold text-primary mb-4">
+            <i class="fas fa-tasks me-3"></i>TaskFlow
+        </h1>
+        <p class="lead mb-4">
+            Organize your life, one task at a time. TaskFlow is a clean and simple task management 
+            application that helps you stay on top of your daily responsibilities and projects.
+        </p>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg px-4 me-md-2">
+                <i class="fas fa-user-plus me-2"></i>Get Started
+            </a>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-lg px-4">
+                <i class="fas fa-sign-in-alt me-2"></i>Login
+            </a>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card shadow-lg">
+            <div class="card-body p-4">
+                <h5 class="card-title text-center mb-4">
+                    <i class="fas fa-star text-warning me-2"></i>Key Features
+                </h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-user-shield text-primary me-3 fs-4"></i>
+                            <div>
+                                <h6 class="mb-1">Secure Authentication</h6>
+                                <small class="text-muted">Personal account protection</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-tasks text-success me-3 fs-4"></i>
+                            <div>
+                                <h6 class="mb-1">Task Management</h6>
+                                <small class="text-muted">Create, edit, and organize tasks</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-chart-bar text-info me-3 fs-4"></i>
+                            <div>
+                                <h6 class="mb-1">Progress Tracking</h6>
+                                <small class="text-muted">Monitor your productivity</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-mobile-alt text-warning me-3 fs-4"></i>
+                            <div>
+                                <h6 class="mb-1">Responsive Design</h6>
+                                <small class="text-muted">Works on all devices</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
