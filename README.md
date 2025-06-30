@@ -1,6 +1,7 @@
 # TaskFlow - Personal Task Management
 
 <!-- CI Pipeline Test: This comment was added to test the GitHub Actions workflow -->
+<!-- Branch Protection Test: Testing the complete workflow with branch protection -->
 
 TaskFlow is a clean and simple task management web application where users can create, organize, and track their personal tasks with ease. It solves the problem of scattered to-do lists and forgotten tasks by providing a centralized, always-accessible place to manage daily responsibilities and projects.
 
