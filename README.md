@@ -100,6 +100,116 @@ taskflow/
 7. **Access the application**
    Open your browser and navigate to `http://localhost:5000`
 
+## Docker Setup
+
+### Prerequisites
+
+- Docker and Docker Compose
+- Git
+
+### Quick Start with Docker
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd taskflow
+   ```
+
+2. **Build and run with Docker Compose**
+   ```bash
+   docker-compose up --build
+   ```
+
+3. **Access the application**
+   Open your browser and navigate to `http://localhost:8000`
+
+4. **Stop the containers**
+   ```bash
+   docker-compose down
+   ```
+
+### Docker Commands
+
+```bash
+# Build the Docker image
+docker build -t taskflow .
+
+# Run the container locally
+docker run -p 8000:8000 taskflow
+
+# Run with environment variables
+docker run -p 8000:8000 \
+  -e DATABASE_URL=postgresql://user:pass@host/db \
+  -e SECRET_KEY=your-secret-key \
+  taskflow
+```
+
+## Cloud Deployment
+
+### Prerequisites
+
+- AWS CLI configured with appropriate permissions
+- Terraform installed
+- Docker installed
+
+### Infrastructure Setup
+
+1. **Configure AWS credentials**
+   ```bash
+   aws configure
+   ```
+
+2. **Set up infrastructure variables**
+   ```bash
+   cd terraform
+   cp terraform.tfvars.example terraform.tfvars
+   # Edit terraform.tfvars with your values
+   ```
+
+3. **Deploy infrastructure**
+   ```bash
+   ./scripts/setup-infrastructure.sh
+   ```
+
+### Application Deployment
+
+1. **Deploy the application**
+   ```bash
+   ./scripts/deploy.sh
+   ```
+
+2. **Access your application**
+   The script will output the public URL of your application.
+
+### Manual Deployment Steps
+
+If you prefer to deploy manually:
+
+1. **Build and push Docker image**
+   ```bash
+   # Get ECR repository URL
+   ECR_REPO_URI=$(aws ecr describe-repositories --repository-names taskflow-app --region us-east-1 --query 'repositories[0].repositoryUri' --output text)
+   
+   # Login to ECR
+   aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REPO_URI
+   
+   # Build and tag image
+   docker build -t taskflow-app .
+   docker tag taskflow-app:latest $ECR_REPO_URI:latest
+   
+   # Push to ECR
+   docker push $ECR_REPO_URI:latest
+   ```
+
+2. **Update ECS service**
+   ```bash
+   aws ecs update-service \
+     --cluster taskflow-cluster \
+     --service taskflow-service \
+     --force-new-deployment \
+     --region us-east-1
+   ```
+
 ### Running Tests
 
 ```bash

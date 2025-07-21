@@ -26,9 +26,15 @@ def create_app(config_class=Config):
     from app.routes.auth import auth_bp
     from app.routes.tasks import tasks_bp
     from app.routes.main import main_bp
+    from app.routes.api import api_bp
+    from app.routes.swagger_api import api as swagger_api
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(tasks_bp)
     app.register_blueprint(main_bp)
+    app.register_blueprint(api_bp)
+    
+    # Initialize Swagger API
+    swagger_api.init_app(app)
 
     return app

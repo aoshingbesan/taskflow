@@ -155,4 +155,11 @@ logs/
 
 # Temporary files
 tmp/
-temp/ 
+temp/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+terraform.tfvars 
