@@ -33,7 +33,7 @@ def create_app(config_class=Config):
     app.register_blueprint(tasks_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(api_bp)
-    
+
     # Initialize Swagger API
     swagger_api.init_app(app)
 
