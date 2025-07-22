@@ -1,21 +1,22 @@
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from mongoengine import Document, StringField, DateTimeField, ReferenceField, IntField
 from app import db, login_manager
 
 
 @login_manager.user_loader
 def load_user(id):
-    return User.query.get(int(id))
+    return User.objects(id=id).first()
 
 
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    tasks = db.relationship("Task", backref="user", lazy="dynamic", cascade="all, delete-orphan")
+class User(UserMixin, Document):
+    meta = {'collection': 'users'}
+    
+    username = StringField(max_length=64, unique=True, required=True)
+    email = StringField(max_length=120, unique=True, required=True)
+    password_hash = StringField(max_length=128)
+    created_at = DateTimeField(default=datetime.utcnow)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -27,14 +28,15 @@ class User(UserMixin, db.Model):
         return f"<User {self.username}>"
 
 
-class Task(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.Text)
-    status = db.Column(db.String(20), default="To Do")  # To Do, In Progress, Completed
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+class Task(Document):
+    meta = {'collection': 'tasks'}
+    
+    title = StringField(max_length=100, required=True)
+    description = StringField()
+    status = StringField(max_length=20, default="To Do")  # To Do, In Progress, Completed
+    created_at = DateTimeField(default=datetime.utcnow)
+    updated_at = DateTimeField(default=datetime.utcnow)
+    user = ReferenceField(User, required=True)
 
     def __repr__(self):
         return f"<Task {self.title}>"

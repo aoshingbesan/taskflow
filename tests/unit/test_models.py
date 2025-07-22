@@ -1,18 +1,24 @@
 import pytest
-from app import create_app, db
+from app import create_app
 from app.models import User, Task
+import mongoengine
 
 
 @pytest.fixture
 def app():
     app = create_app()
     app.config["TESTING"] = True
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+    app.config["MONGODB_SETTINGS"] = {"host": "mongodb://localhost:27017/taskflow_test"}
 
     with app.app_context():
-        db.create_all()
+        # Clear test database
+        mongoengine.disconnect()
+        mongoengine.connect(db="taskflow_test", host="mongodb://localhost:27017/taskflow_test")
         yield app
-        db.drop_all()
+        # Clean up
+        User.objects.delete()
+        Task.objects.delete()
+        mongoengine.disconnect()
 
 
 @pytest.fixture
@@ -30,8 +36,7 @@ class TestUser:
         with app.app_context():
             user = User(username="testuser", email="test@example.com")
             user.set_password("password123")
-            db.session.add(user)
-            db.session.commit()
+            user.save()
 
             assert user.id is not None
             assert user.username == "testuser"
@@ -50,18 +55,16 @@ class TestTask:
         with app.app_context():
             user = User(username="testuser", email="test@example.com")
             user.set_password("password123")
-            db.session.add(user)
-            db.session.commit()
+            user.save()
 
-            task = Task(title="Test Task", description="Test Description", status="To Do", user_id=user.id)
-            db.session.add(task)
-            db.session.commit()
+            task = Task(title="Test Task", description="Test Description", status="To Do", user=user)
+            task.save()
 
             assert task.id is not None
             assert task.title == "Test Task"
             assert task.description == "Test Description"
             assert task.status == "To Do"
-            assert task.user_id == user.id
+            assert task.user == user
 
     def test_task_repr(self, app):
         with app.app_context():
@@ -72,14 +75,14 @@ class TestTask:
         with app.app_context():
             user = User(username="testuser", email="test@example.com")
             user.set_password("password123")
-            db.session.add(user)
-            db.session.commit()
+            user.save()
 
-            task1 = Task(title="Task 1", user_id=user.id)
-            task2 = Task(title="Task 2", user_id=user.id)
-            db.session.add_all([task1, task2])
-            db.session.commit()
+            task1 = Task(title="Task 1", user=user)
+            task2 = Task(title="Task 2", user=user)
+            task1.save()
+            task2.save()
 
-            assert len(user.tasks.all()) == 2
-            assert task1 in user.tasks.all()
-            assert task2 in user.tasks.all()
+            user_tasks = Task.objects(user=user)
+            assert user_tasks.count() == 2
+            assert task1 in user_tasks
+            assert task2 in user_tasks

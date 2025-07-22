@@ -98,7 +98,7 @@ taskflow/
    ```
 
 7. **Access the application**
-   Open your browser and navigate to `http://localhost:5000`
+   Open your browser and navigate to `http://localhost:8000`
 
 ## Docker Setup
 
@@ -276,4 +276,24 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 **Ademola Emmanuel Oshingbesan**
 
-This project was created as part of an Advanced DevOps course assignment. 
+This project was created as part of an Advanced DevOps course assignment.
+
+## Phase 2: Containerization, IaC & Manual Deployment
+
+### ✅ Completed Features:
+- **Containerization**: Dockerfile and docker-compose.yml working
+- **Swagger UI API**: Interactive documentation at `/docs`
+- **Infrastructure as Code**: Terraform configurations ready
+- **CI/CD Pipeline**: All tests passing, code formatted
+- **Deployment Scripts**: AWS automation ready
+
+### 🚀 Ready for Deployment:
+- Local Docker setup: `docker-compose up`
+- Swagger UI: http://localhost:8000/docs
+- All tests passing ✅
+- Code formatting compliant ✅
+
+### 📋 Next Steps:
+- AWS infrastructure deployment
+- Manual cloud deployment
+- Peer review completion 

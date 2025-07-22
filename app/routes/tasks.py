@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
 from app.models import Task
-from app import db
 
 tasks_bp = Blueprint("tasks", __name__)
 
@@ -12,9 +11,9 @@ def task_list():
     status_filter = request.args.get("status", "all")
 
     if status_filter == "all":
-        tasks = current_user.tasks.order_by(Task.created_at.desc()).all()
+        tasks = Task.objects(user=current_user).order_by("-created_at")
     else:
-        tasks = current_user.tasks.filter_by(status=status_filter).order_by(Task.created_at.desc()).all()
+        tasks = Task.objects(user=current_user, status=status_filter).order_by("-created_at")
 
     return render_template("tasks/list.html", tasks=tasks, current_filter=status_filter)
 
@@ -31,10 +30,8 @@ def create_task():
             flash("Task title is required.", "error")
             return render_template("tasks/create.html")
 
-        task = Task(title=title, description=description, status=status, user_id=current_user.id)
-
-        db.session.add(task)
-        db.session.commit()
+        task = Task(title=title, description=description, status=status, user=current_user)
+        task.save()
 
         flash("Task created successfully!", "success")
         return redirect(url_for("tasks.task_list"))
@@ -42,12 +39,12 @@ def create_task():
     return render_template("tasks/create.html")
 
 
-@tasks_bp.route("/tasks/<int:task_id>/edit", methods=["GET", "POST"])
+@tasks_bp.route("/tasks/<task_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit_task(task_id):
-    task = Task.query.get_or_404(task_id)
+    task = Task.objects(id=task_id).first_or_404()
 
-    if task.user_id != current_user.id:
+    if task.user != current_user:
         flash("You can only edit your own tasks.", "error")
         return redirect(url_for("tasks.task_list"))
 
@@ -60,41 +57,39 @@ def edit_task(task_id):
             flash("Task title is required.", "error")
             return render_template("tasks/edit.html", task=task)
 
-        db.session.commit()
+        task.save()
         flash("Task updated successfully!", "success")
         return redirect(url_for("tasks.task_list"))
 
     return render_template("tasks/edit.html", task=task)
 
 
-@tasks_bp.route("/tasks/<int:task_id>/delete", methods=["POST"])
+@tasks_bp.route("/tasks/<task_id>/delete", methods=["POST"])
 @login_required
 def delete_task(task_id):
-    task = Task.query.get_or_404(task_id)
+    task = Task.objects(id=task_id).first_or_404()
 
-    if task.user_id != current_user.id:
+    if task.user != current_user:
         flash("You can only delete your own tasks.", "error")
         return redirect(url_for("tasks.task_list"))
 
-    db.session.delete(task)
-    db.session.commit()
-
+    task.delete()
     flash("Task deleted successfully!", "success")
     return redirect(url_for("tasks.task_list"))
 
 
-@tasks_bp.route("/tasks/<int:task_id>/status", methods=["POST"])
+@tasks_bp.route("/tasks/<task_id>/status", methods=["POST"])
 @login_required
 def update_status(task_id):
-    task = Task.query.get_or_404(task_id)
+    task = Task.objects(id=task_id).first_or_404()
 
-    if task.user_id != current_user.id:
+    if task.user != current_user:
         return jsonify({"error": "Unauthorized"}), 403
 
     new_status = request.json.get("status")
     if new_status in ["To Do", "In Progress", "Completed"]:
         task.status = new_status
-        db.session.commit()
+        task.save()
         return jsonify({"success": True, "status": new_status})
 
     return jsonify({"error": "Invalid status"}), 400

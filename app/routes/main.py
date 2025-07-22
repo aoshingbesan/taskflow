@@ -22,13 +22,13 @@ def health():
 @login_required
 def dashboard():
     # Get task statistics
-    total_tasks = current_user.tasks.count()
-    todo_tasks = current_user.tasks.filter_by(status="To Do").count()
-    in_progress_tasks = current_user.tasks.filter_by(status="In Progress").count()
-    completed_tasks = current_user.tasks.filter_by(status="Completed").count()
+    total_tasks = Task.objects(user=current_user).count()
+    todo_tasks = Task.objects(user=current_user, status="To Do").count()
+    in_progress_tasks = Task.objects(user=current_user, status="In Progress").count()
+    completed_tasks = Task.objects(user=current_user, status="Completed").count()
 
     # Get recent tasks
-    recent_tasks = current_user.tasks.order_by(Task.created_at.desc()).limit(5).all()
+    recent_tasks = Task.objects(user=current_user).order_by("-created_at").limit(5)
 
     stats = {"total": total_tasks, "todo": todo_tasks, "in_progress": in_progress_tasks, "completed": completed_tasks}
 
