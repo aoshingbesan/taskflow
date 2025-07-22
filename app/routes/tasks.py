@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, abort
 from flask_login import login_required, current_user
 from app.models import Task
 
@@ -42,7 +42,9 @@ def create_task():
 @tasks_bp.route("/tasks/<task_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit_task(task_id):
-    task = Task.objects(id=task_id).first_or_404()
+    task = Task.objects(id=task_id).first()
+    if not task:
+        abort(404)
 
     if task.user != current_user:
         flash("You can only edit your own tasks.", "error")
@@ -67,7 +69,9 @@ def edit_task(task_id):
 @tasks_bp.route("/tasks/<task_id>/delete", methods=["POST"])
 @login_required
 def delete_task(task_id):
-    task = Task.objects(id=task_id).first_or_404()
+    task = Task.objects(id=task_id).first()
+    if not task:
+        abort(404)
 
     if task.user != current_user:
         flash("You can only delete your own tasks.", "error")
@@ -81,7 +85,9 @@ def delete_task(task_id):
 @tasks_bp.route("/tasks/<task_id>/status", methods=["POST"])
 @login_required
 def update_status(task_id):
-    task = Task.objects(id=task_id).first_or_404()
+    task = Task.objects(id=task_id).first()
+    if not task:
+        abort(404)
 
     if task.user != current_user:
         return jsonify({"error": "Unauthorized"}), 403
