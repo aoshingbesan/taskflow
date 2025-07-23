@@ -1,0 +1,16 @@
+# AWS Configuration
+aws_region = "us-east-1"
+environment = "production"
+
+# Database Configuration
+db_password = "your-secure-database-password-here"
+
+# Application Configuration
+secret_key = "your-secure-flask-secret-key-here"
+
+# Optional: Override defaults
+# project_name = "taskflow"
+# db_instance_class = "db.t3.micro"
+# app_cpu = 256
+# app_memory = 512
+# app_desired_count = 1 
