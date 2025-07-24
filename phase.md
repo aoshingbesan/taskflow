@@ -8,6 +8,8 @@
 ### **2. Live Public URL**
 **Application URL:** https://taskflow-app.azurewebsites.net
 
+### **3. Screenshots of Successfully Provisioned Resources**
+
 #### **Azure Portal - Resource Group**
 ![Azure Resource Group](images/azure-resource-group.png)
 *Resource Group: taskflow-rg with all resources deployed*
@@ -23,7 +25,6 @@
 #### **Terraform Deployment**
 ![Terraform Output](images/terraform-deployment.png)
 *Infrastructure successfully provisioned*
-   ```
 
 #### **Docker Containerization**
 ![Docker Build](images/docker-build.png)
