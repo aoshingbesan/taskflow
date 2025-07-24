@@ -15,7 +15,7 @@ def load_user(id):
 
 
 class User(UserMixin, Document):
-    meta = {'collection': 'users'}
+    meta = {"collection": "users"}
     
     username = StringField(max_length=64, unique=True, required=True)
     email = StringField(max_length=120, unique=True, required=True)
@@ -33,7 +33,7 @@ class User(UserMixin, Document):
 
 
 class Task(Document):
-    meta = {'collection': 'tasks'}
+    meta = {"collection": "tasks"}
     
     title = StringField(max_length=100, required=True)
     description = StringField()

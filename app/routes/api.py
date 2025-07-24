@@ -69,7 +69,9 @@ def login():
     if user and user.check_password(password):
         login_user(user)
         return (
-            jsonify({"message": "Login successful", "user": {"id": str(user.id), "username": user.username, "email": user.email}}),
+            jsonify(
+                {"message": "Login successful", "user": {"id": str(user.id), "username": user.username, "email": user.email}}
+            ),
             200,
         )
     else:
@@ -88,7 +90,12 @@ def logout():
 @login_required
 def get_current_user():
     """Get current user information"""
-    return jsonify({"user": {"id": current_user.id, "username": current_user.username, "email": current_user.email}}), 200
+    return (
+        jsonify(
+            {"user": {"id": current_user.id, "username": current_user.username, "email": current_user.email}}
+        ),
+        200,
+    )
 
 
 # Task endpoints
