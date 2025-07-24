@@ -18,10 +18,14 @@ TaskFlow is a clean and simple task management web application where users can c
 
 - **Backend**: Python Flask
 - **Frontend**: HTML/CSS/JavaScript with Bootstrap 5
-- **Database**: PostgreSQL
+- **Database**: MongoDB Atlas (Cloud Database)
 - **Authentication**: Flask-Login with password hashing
 - **Testing**: pytest with coverage reporting
 - **CI/CD**: GitHub Actions with automated testing and linting
+- **Cloud Platform**: Azure App Service
+- **Infrastructure**: Terraform (Infrastructure as Code)
+- **Containerization**: Docker
+- **Monitoring**: Azure Application Insights
 
 ## Project Structure
 
@@ -146,17 +150,22 @@ docker run -p 8000:8000 \
 
 ## Cloud Deployment
 
+### 🌐 **Live Application**
+**TaskFlow is now deployed and accessible at:**
+**https://taskflow-app.azurewebsites.net**
+
 ### Prerequisites
 
-- AWS CLI configured with appropriate permissions
+- Azure CLI configured with appropriate permissions
 - Terraform installed
 - Docker installed
 
 ### Infrastructure Setup
 
-1. **Configure AWS credentials**
+1. **Configure Azure credentials**
    ```bash
-   aws configure
+   az login
+   az account set --subscription <your-subscription-id>
    ```
 
 2. **Set up infrastructure variables**
@@ -168,18 +177,24 @@ docker run -p 8000:8000 \
 
 3. **Deploy infrastructure**
    ```bash
-   ./scripts/setup-infrastructure.sh
+   terraform init
+   terraform plan
+   terraform apply
    ```
 
 ### Application Deployment
 
 1. **Deploy the application**
    ```bash
-   ./scripts/deploy.sh
+   # Create deployment package
+   zip -r taskflow-deployment.zip . -x "*.git*" "venv/*" "terraform/*" "tests/*" "*.pyc" "__pycache__/*"
+   
+   # Deploy to Azure App Service
+   az webapp deployment source config-zip --resource-group taskflow-rg --name taskflow-app --src taskflow-deployment.zip
    ```
 
 2. **Access your application**
-   The script will output the public URL of your application.
+   Visit: https://taskflow-app.azurewebsites.net
 
 ### Manual Deployment Steps
 
@@ -187,27 +202,17 @@ If you prefer to deploy manually:
 
 1. **Build and push Docker image**
    ```bash
-   # Get ECR repository URL
-   ECR_REPO_URI=$(aws ecr describe-repositories --repository-names taskflow-app --region us-east-1 --query 'repositories[0].repositoryUri' --output text)
-   
-   # Login to ECR
-   aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REPO_URI
-   
-   # Build and tag image
+   # Build Docker image
    docker build -t taskflow-app .
-   docker tag taskflow-app:latest $ECR_REPO_URI:latest
    
-   # Push to ECR
-   docker push $ECR_REPO_URI:latest
+   # Run locally for testing
+   docker run -p 8000:8000 taskflow-app
    ```
 
-2. **Update ECS service**
+2. **Deploy to Azure App Service**
    ```bash
-   aws ecs update-service \
-     --cluster taskflow-cluster \
-     --service taskflow-service \
-     --force-new-deployment \
-     --region us-east-1
+   # Deploy using Azure CLI
+   az webapp deployment source config-zip --resource-group taskflow-rg --name taskflow-app --src taskflow-deployment.zip
    ```
 
 ### Running Tests
@@ -244,17 +249,30 @@ The main branch is protected with the following rules:
 
 ## API Endpoints
 
+### 🔗 **API Documentation**
+**Interactive API documentation available at:**
+**https://taskflow-app.azurewebsites.net/docs**
+
 ### Authentication
-- `GET/POST /register` - User registration
-- `GET/POST /login` - User login
-- `GET /logout` - User logout
+- `POST /api/v1/auth/register` - User registration
+- `POST /api/v1/auth/login` - User login
+- `GET /api/v1/auth/me` - Get current user
+- `POST /api/v1/auth/logout` - User logout
 
 ### Tasks
-- `GET /tasks` - List all tasks (with optional status filter)
-- `GET/POST /tasks/new` - Create new task
-- `GET/POST /tasks/<id>/edit` - Edit existing task
-- `POST /tasks/<id>/delete` - Delete task
-- `POST /tasks/<id>/status` - Update task status
+- `GET /api/v1/tasks` - List all tasks (with optional status filter)
+- `POST /api/v1/tasks` - Create new task
+- `GET /api/v1/tasks/{id}` - Get specific task
+- `PUT /api/v1/tasks/{id}` - Update task
+- `PATCH /api/v1/tasks/{id}/status` - Update task status
+- `DELETE /api/v1/tasks/{id}` - Delete task
+
+### Dashboard
+- `GET /api/v1/dashboard` - Get dashboard statistics
+
+### Health Checks
+- `GET /health` - Main health check
+- `GET /api/v1/health` - API health check
 
 ### Main
 - `GET /` - Landing page
@@ -276,24 +294,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 **Ademola Emmanuel Oshingbesan**
 
-This project was created as part of an Advanced DevOps course assignment.
-
-## Phase 2: Containerization, IaC & Manual Deployment
-
-### ✅ Completed Features:
-- **Containerization**: Dockerfile and docker-compose.yml working
-- **Swagger UI API**: Interactive documentation at `/docs`
-- **Infrastructure as Code**: Terraform configurations ready
-- **CI/CD Pipeline**: All tests passing, code formatted
-- **Deployment Scripts**: AWS automation ready
-
-### 🚀 Ready for Deployment:
-- Local Docker setup: `docker-compose up`
-- Swagger UI: http://localhost:8000/docs
-- All tests passing ✅
-- Code formatting compliant ✅
-
-### 📋 Next Steps:
-- AWS infrastructure deployment
-- Manual cloud deployment
-- Peer review completion 
+This project was created as part of an Advanced DevOps course assignment. 

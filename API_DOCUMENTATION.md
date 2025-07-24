@@ -2,7 +2,7 @@
 
 ## Base URL
 ```
-http://localhost:8000/api/v1
+https://taskflow-app.azurewebsites.net/api/v1
 ```
 
 ## Authentication
