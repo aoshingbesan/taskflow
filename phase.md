@@ -1,5 +1,76 @@
 # Phase 2 - IaC, Containerization & Cloud Deployment
 
+## 📋 **Submission Requirements**
+
+### **1. Repository Link**
+**GitHub Repository:** https://github.com/aoshingbesan/taskflow
+
+### **2. Live Public URL**
+**Application URL:** https://taskflow-app.azurewebsites.net
+
+### **3. Screenshots of Successfully Provisioned Resources**
+
+#### **Azure Portal - Resource Group**
+![Azure Resource Group](images/azure-resource-group.png)
+*Resource Group: taskflow-rg with all resources deployed*
+
+#### **Azure App Service**
+![Azure App Service](images/azure-app-service.png)
+*App Service: taskflow-app running successfully*
+
+#### **Application Insights**
+![Application Insights](images/application-insights.png)
+*Monitoring and logging configured*
+
+#### **Terraform Deployment**
+![Terraform Output](images/terraform-deployment.png)
+*Infrastructure successfully provisioned*
+
+#### **Docker Containerization**
+![Docker Build](images/docker-build.png)
+*Docker image built and tested successfully*
+
+#### **CI/CD Pipeline**
+![GitHub Actions](images/github-actions.png)
+*Automated testing and deployment pipeline*
+
+### **4. Peer Review Link**
+**Pull Request Reviewed:** [Link to peer's PR will be added after review]
+
+### **5. Reflection on IaC and Manual Deployment Challenges**
+
+#### **Infrastructure as Code (Terraform) Challenges & Benefits**
+
+**Challenges:**
+1. **Learning Curve**: Understanding Terraform syntax and Azure provider configuration required significant time investment
+2. **State Management**: Ensuring Terraform state is properly managed and backed up to prevent infrastructure drift
+3. **Resource Dependencies**: Managing complex dependencies between Azure resources (VNet → Subnet → App Service)
+4. **Variable Management**: Properly structuring variables and ensuring sensitive data is not exposed in code
+5. **Error Handling**: Debugging Terraform errors when resources fail to provision
+
+**Benefits:**
+1. **Reproducibility**: Infrastructure can be recreated exactly the same way across environments
+2. **Version Control**: All infrastructure changes are tracked in Git with clear history
+3. **Collaboration**: Team members can review and approve infrastructure changes
+4. **Documentation**: Terraform code serves as living documentation of infrastructure
+5. **Cost Control**: Easy to destroy and recreate resources, preventing unnecessary costs
+
+#### **Manual Deployment Process Challenges**
+
+**Challenges:**
+1. **Environment Consistency**: Ensuring development, staging, and production environments are identical
+2. **Configuration Management**: Managing different configuration files for different environments
+3. **Database Migration**: Handling database schema changes across environments
+4. **Rollback Procedures**: Having proper rollback mechanisms when deployments fail
+5. **Monitoring Setup**: Configuring proper monitoring and alerting for the deployed application
+
+**Solutions Implemented:**
+1. **Docker Containerization**: Ensured consistent runtime environment across all deployments
+2. **Environment Variables**: Used Azure App Service configuration for environment-specific settings
+3. **Health Checks**: Implemented comprehensive health check endpoints for monitoring
+4. **CI/CD Pipeline**: Automated testing and deployment processes
+5. **Infrastructure Monitoring**: Integrated Application Insights for comprehensive monitoring
+
 ## ✅ **COMPLETED - Live Application URL**
 **Application URL:** https://taskflow-app.azurewebsites.net
 
@@ -172,13 +243,6 @@ curl https://taskflow-app.azurewebsites.net/api/v1/health
 2. **Microservices**: Break down into smaller, focused services
 3. **Load Balancing**: Implement proper load balancing
 4. **Database Optimization**: Add indexes and query optimization
-
-## 📋 **Peer Review**
-
-### **Pull Request Reviewed**
-**Repository:** [Your GitHub repository]
-**Pull Request:** [Phase 2 deployment PR]
-**Review Comments:** [To be added after peer review]
 
 ## 🎉 **Phase 2 Completion Summary**
 
