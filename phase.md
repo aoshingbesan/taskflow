@@ -22,10 +22,6 @@
 ![Application Insights](images/application-insights.png)
 *Monitoring and logging configured*
 
-#### **Terraform Deployment**
-![Terraform Output](images/terraform-deployment.png)
-*Infrastructure successfully provisioned*
-
 #### **Docker Containerization**
 ![Docker Build](images/docker-build.png)
 *Docker image built and tested successfully*

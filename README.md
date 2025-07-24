@@ -37,7 +37,9 @@ taskflow/
 │   ├── routes/
 │   │   ├── auth.py          # Authentication routes
 │   │   ├── main.py          # Main routes (dashboard, index)
-│   │   └── tasks.py         # Task management routes
+│   │   ├── tasks.py         # Task management routes
+│   │   ├── api.py           # REST API endpoints
+│   │   └── swagger_api.py   # Swagger documentation
 │   ├── static/              # CSS, JS, and static assets
 │   └── templates/           # HTML templates
 │       ├── auth/            # Login and registration templates
@@ -45,25 +47,189 @@ taskflow/
 │       └── tasks/           # Task management templates
 ├── tests/
 │   └── unit/               # Unit tests
+├── terraform/              # Infrastructure as Code
 ├── config.py               # Application configuration
-├── app.py                  # Application entry point
+├── main_app.py             # Application entry point
 ├── requirements.txt        # Python dependencies
+├── Dockerfile              # Docker configuration
+├── docker-compose.yml      # Docker Compose setup
 └── README.md              # This file
 ```
 
-## Local Development Setup
+## 🐳 Docker-Based Setup Instructions
+
+### Prerequisites
+
+- **Docker** installed on your system
+- **Docker Compose** (usually comes with Docker Desktop)
+- **Git** for cloning the repository
+
+### Quick Start with Docker
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/aoshingbesan/taskflow.git
+   cd taskflow
+   ```
+
+2. **Set up environment variables**
+   ```bash
+   # Copy the example environment file
+   cp env.example .env
+   
+   # Edit .env with your MongoDB Atlas connection string
+   # Get your connection string from MongoDB Atlas dashboard
+   ```
+
+3. **Build and run with Docker Compose**
+   ```bash
+   # Build and start all services
+   docker-compose up --build
+   
+   # Or run in detached mode
+   docker-compose up -d --build
+   ```
+
+4. **Access the application**
+   - **Main Application**: http://localhost:8000
+   - **API Documentation**: http://localhost:8000/docs
+   - **Health Check**: http://localhost:8000/health
+
+5. **Stop the containers**
+   ```bash
+   docker-compose down
+   ```
+
+### Docker Commands Reference
+
+#### **Building and Running**
+```bash
+# Build the Docker image
+docker build -t taskflow .
+
+# Run the container locally
+docker run -p 8000:8000 taskflow
+
+# Run with environment variables
+docker run -p 8000:8000 \
+  -e MONGODB_URI="your-mongodb-connection-string" \
+  -e SECRET_KEY="your-secret-key" \
+  taskflow
+```
+
+#### **Development with Docker**
+```bash
+# Run in development mode with volume mounting
+docker run -p 8000:8000 \
+  -v $(pwd):/app \
+  -e FLASK_ENV=development \
+  taskflow
+
+# Run with hot reload
+docker-compose -f docker-compose.dev.yml up
+```
+
+#### **Docker Compose Commands**
+```bash
+# Start all services
+docker-compose up
+
+# Start in background
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop all services
+docker-compose down
+
+# Rebuild and start
+docker-compose up --build
+
+# Remove all containers and volumes
+docker-compose down -v
+```
+
+### Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
+# Flask Configuration
+SECRET_KEY=your-super-secret-key-here
+FLASK_ENV=production
+FLASK_DEBUG=False
+
+# MongoDB Configuration
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database?retryWrites=true&w=majority
+
+# Application Configuration
+APP_NAME=TaskFlow
+APP_VERSION=1.0.0
+```
+
+### Dockerfile Details
+
+The application uses a multi-stage Docker build for optimization:
+
+```dockerfile
+# Build stage
+FROM python:3.9-slim as builder
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --user -r requirements.txt
+
+# Production stage
+FROM python:3.9-slim
+WORKDIR /app
+COPY --from=builder /root/.local /root/.local
+COPY . .
+
+# Security: Run as non-root user
+RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+USER appuser
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:8000/health || exit 1
+
+EXPOSE 8000
+CMD ["python", "main_app.py"]
+```
+
+### Docker Compose Configuration
+
+The `docker-compose.yml` file sets up the complete development environment:
+
+```yaml
+version: '3.8'
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - FLASK_ENV=development
+      - MONGODB_URI=${MONGODB_URI}
+      - SECRET_KEY=${SECRET_KEY}
+    volumes:
+      - .:/app
+    restart: unless-stopped
+```
+
+## Local Development Setup (Alternative)
 
 ### Prerequisites
 
 - Python 3.9 or higher
-- PostgreSQL database
+- MongoDB Atlas account
 - Git
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/aoshingbesan/taskflow.git
    cd taskflow
    ```
 
@@ -84,75 +250,14 @@ taskflow/
    SECRET_KEY=your-secret-key-here
    MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database?retryWrites=true&w=majority
    ```
-   
-   You can copy from the example file:
+
+5. **Run the application**
    ```bash
-   cp env.example .env
-   # Then edit .env with your actual values
+   python main_app.py
    ```
 
-5. **Set up the database**
-   ```bash
-   # Create PostgreSQL database
-   createdb taskflow
-   
-   # Initialize database tables
-   flask db init
-   flask db migrate -m "Initial migration"
-   flask db upgrade
-   ```
-
-6. **Run the application**
-   ```bash
-   python app.py
-   ```
-
-7. **Access the application**
+6. **Access the application**
    Open your browser and navigate to `http://localhost:8000`
-
-## Docker Setup
-
-### Prerequisites
-
-- Docker and Docker Compose
-- Git
-
-### Quick Start with Docker
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd taskflow
-   ```
-
-2. **Build and run with Docker Compose**
-   ```bash
-   docker-compose up --build
-   ```
-
-3. **Access the application**
-   Open your browser and navigate to `http://localhost:8000`
-
-4. **Stop the containers**
-   ```bash
-   docker-compose down
-   ```
-
-### Docker Commands
-
-```bash
-# Build the Docker image
-docker build -t taskflow .
-
-# Run the container locally
-docker run -p 8000:8000 taskflow
-
-# Run with environment variables
-docker run -p 8000:8000 \
-  -e DATABASE_URL=postgresql://user:pass@host/db \
-  -e SECRET_KEY=your-secret-key \
-  taskflow
-```
 
 ## Cloud Deployment
 
@@ -244,7 +349,7 @@ This project uses GitHub Actions for continuous integration:
 - **Automated Testing**: Runs on every push and pull request
 - **Code Quality**: Linting with flake8 and formatting checks with black
 - **Coverage Reporting**: Generates test coverage reports
-- **Database Testing**: Uses PostgreSQL service container for integration tests
+- **Database Testing**: Uses MongoDB service container for integration tests
 
 ### Branch Protection Rules
 

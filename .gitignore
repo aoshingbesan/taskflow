@@ -201,4 +201,26 @@ logs/
 # Application specific
 instance/
 webapp_logs.zip
-taskflow-deployment*.zip 
+taskflow-deployment*.zip
+
+# Additional cleanup entries
+AWSCLIV2.pkg
+*.pkg
+*.zip
+*.tar.gz
+*.tar
+
+# Documentation files that are redundant
+API_DOCUMENTATION.md
+API_ASSESSMENT_REPORT.md
+DEPLOYMENT.md
+SUBMISSION_CHECKLIST.md
+PHASE2_SUMMARY.md
+
+# Coverage reports
+coverage.xml
+htmlcov/
+
+# Docker temporary files
+.dockerignore
+docker-compose.override.yml 
