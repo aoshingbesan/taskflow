@@ -1,8 +1,5 @@
 # TaskFlow - Personal Task Management
 
-<!-- CI Pipeline Test: This comment was added to test the GitHub Actions workflow -->
-<!-- Branch Protection Test: Testing the complete workflow with branch protection -->
-
 TaskFlow is a clean and simple task management web application where users can create, organize, and track their personal tasks with ease. It solves the problem of scattered to-do lists and forgotten tasks by providing a centralized, always-accessible place to manage daily responsibilities and projects.
 
 ## Features
@@ -31,29 +28,38 @@ TaskFlow is a clean and simple task management web application where users can c
 
 ```
 taskflow/
-├── app/
-│   ├── __init__.py          # Flask application factory
-│   ├── models.py            # Database models (User, Task)
-│   ├── routes/
-│   │   ├── auth.py          # Authentication routes
-│   │   ├── main.py          # Main routes (dashboard, index)
-│   │   ├── tasks.py         # Task management routes
-│   │   ├── api.py           # REST API endpoints
-│   │   └── swagger_api.py   # Swagger documentation
-│   ├── static/              # CSS, JS, and static assets
-│   └── templates/           # HTML templates
-│       ├── auth/            # Login and registration templates
-│       ├── main/            # Dashboard and index templates
-│       └── tasks/           # Task management templates
-├── tests/
-│   └── unit/               # Unit tests
-├── terraform/              # Infrastructure as Code
-├── config.py               # Application configuration
-├── main_app.py             # Application entry point
-├── requirements.txt        # Python dependencies
-├── Dockerfile              # Docker configuration
-├── docker-compose.yml      # Docker Compose setup
-└── README.md              # This file
+├── app/                    # Flask application
+│   ├── __init__.py         # Application factory
+│   ├── models.py           # Database models
+│   ├── routes/             # Route handlers
+│   │   ├── auth.py         # Authentication routes
+│   │   ├── main.py         # Main routes
+│   │   ├── tasks.py        # Task management
+│   │   ├── api.py          # REST API endpoints
+│   │   └── swagger_api.py  # API documentation
+│   ├── static/             # Static assets
+│   └── templates/          # HTML templates
+├── tests/                  # Test suite
+│   └── unit/              # Unit tests
+├── terraform/             # Infrastructure as Code
+├── images/                # Screenshots for submission
+├── scripts/               # Deployment scripts
+├── migrations/            # Database migrations
+├── .github/               # GitHub Actions workflows
+├── README.md              # This documentation
+├── phase.md               # Phase 2 submission details
+├── requirements.txt       # Python dependencies
+├── Dockerfile             # Container configuration
+├── docker-compose.yml     # Docker setup
+├── main_app.py            # Application entry point
+├── wsgi.py                # WSGI entry point
+├── config.py              # Configuration
+├── env.example            # Environment variables template
+├── test_simple.py         # Simple test runner
+├── pytest.ini            # pytest configuration
+├── .flake8                # flake8 configuration
+├── pyproject.toml         # Project metadata
+└── .gitignore            # Git ignore rules
 ```
 
 ## 🐳 Docker-Based Setup Instructions

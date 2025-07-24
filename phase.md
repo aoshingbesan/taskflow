@@ -22,6 +22,37 @@
 ![Application Insights](images/application-insights.png)
 *Monitoring and logging configured*
 
+#### **Terraform Deployment**
+![Terraform Output](images/terraform-deployment.png)
+*Infrastructure successfully provisioned*
+
+**How to Take Terraform Screenshot:**
+1. **Navigate to terraform directory:**
+   ```bash
+   cd terraform
+   ```
+
+2. **Run Terraform plan:**
+   ```bash
+   terraform plan
+   ```
+
+3. **Run Terraform apply:**
+   ```bash
+   terraform apply
+   ```
+
+4. **Take screenshot of the output** showing:
+   - Successful resource creation
+   - Resource count and status
+   - No errors or warnings
+   - Final "Apply complete!" message
+
+5. **Alternative: Show current state:**
+   ```bash
+   terraform show
+   ```
+
 #### **Docker Containerization**
 ![Docker Build](images/docker-build.png)
 *Docker image built and tested successfully*
@@ -31,9 +62,51 @@
 *Automated testing and deployment pipeline*
 
 ### **4. Peer Review Link**
-**Pull Request Reviewed:** [Link to peer's PR will be added after review]
+**Pull Request Reviewed:** https://github.com/Eyiniola/shop-lite/pull/20#pullrequestreview-3052897535
 
-### **5. Reflection on IaC and Manual Deployment Challenges**
+### **5. Screenshot Instructions**
+
+#### **Azure Portal Screenshots:**
+
+**Resource Group Screenshot:**
+1. Go to Azure Portal (portal.azure.com)
+2. Navigate to Resource Groups
+3. Click on "taskflow-rg"
+4. Take screenshot showing all resources deployed
+5. Save as `images/azure-resource-group.png`
+
+**App Service Screenshot:**
+1. In Azure Portal, go to App Services
+2. Click on "taskflow-app"
+3. Take screenshot of Overview page showing running status
+4. Save as `images/azure-app-service.png`
+
+**Application Insights Screenshot:**
+1. In Azure Portal, go to Application Insights
+2. Click on "taskflow-insights"
+3. Take screenshot of Overview or Live Metrics
+4. Save as `images/application-insights.png`
+
+#### **Terraform Screenshot:**
+1. Open terminal in project root
+2. Navigate to terraform directory: `cd terraform`
+3. Run: `terraform plan`
+4. Run: `terraform apply`
+5. Take screenshot of successful output
+6. Save as `images/terraform-deployment.png`
+
+#### **Docker Screenshot:**
+1. In project root, run: `docker build -t taskflow .`
+2. Take screenshot of successful build output
+3. Save as `images/docker-build.png`
+
+#### **GitHub Actions Screenshot:**
+1. Go to your GitHub repository
+2. Click on "Actions" tab
+3. Take screenshot of successful workflow runs
+4. Save as `images/github-actions.png`
+
+### **6. Reflection on IaC and Manual Deployment Challenges**
 
 #### **Infrastructure as Code (Terraform) Challenges & Benefits**
 
