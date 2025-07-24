@@ -82,7 +82,13 @@ taskflow/
    Create a `.env` file in the root directory:
    ```env
    SECRET_KEY=your-secret-key-here
-   DATABASE_URL=postgresql://username:password@localhost/taskflow
+   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database?retryWrites=true&w=majority
+   ```
+   
+   You can copy from the example file:
+   ```bash
+   cp env.example .env
+   # Then edit .env with your actual values
    ```
 
 5. **Set up the database**
