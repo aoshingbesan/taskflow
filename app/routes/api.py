@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from app.models import User, Task, db
+from app.models import User, Task
 from datetime import datetime
 
 api_bp = Blueprint("api", __name__, url_prefix="/api/v1")
@@ -24,30 +24,29 @@ def register():
         return jsonify({"error": "Missing required fields"}), 400
 
     # Check if user already exists
-    if User.query.filter_by(username=username).first():
+    if User.objects(username=username).first():
         return jsonify({"error": "Username already exists"}), 409
 
-    if User.query.filter_by(email=email).first():
+    if User.objects(email=email).first():
         return jsonify({"error": "Email already exists"}), 409
 
     # Create new user
-    user = User(username=username, email=email, password_hash=generate_password_hash(password))
+    user = User(username=username, email=email)
+    user.set_password(password)
 
     try:
-        db.session.add(user)
-        db.session.commit()
+        user.save()
 
         return (
             jsonify(
                 {
                     "message": "User registered successfully",
-                    "user": {"id": user.id, "username": user.username, "email": user.email},
+                    "user": {"id": str(user.id), "username": user.username, "email": user.email},
                 }
             ),
             201,
         )
     except Exception as e:
-        db.session.rollback()
         return jsonify({"error": "Registration failed"}), 500
 
 
@@ -65,12 +64,14 @@ def login():
     if not all([username, password]):
         return jsonify({"error": "Missing username or password"}), 400
 
-    user = User.query.filter_by(username=username).first()
+    user = User.objects(username=username).first()
 
-    if user and check_password_hash(user.password_hash, password):
+    if user and user.check_password(password):
         login_user(user)
         return (
-            jsonify({"message": "Login successful", "user": {"id": user.id, "username": user.username, "email": user.email}}),
+            jsonify(
+                {"message": "Login successful", "user": {"id": str(user.id), "username": user.username, "email": user.email}}
+            ),
             200,
         )
     else:
@@ -99,19 +100,17 @@ def get_tasks():
     """Get all tasks for current user"""
     status_filter = request.args.get("status")
 
-    query = current_user.tasks
-
     if status_filter:
-        query = query.filter_by(status=status_filter)
-
-    tasks = query.order_by(Task.created_at.desc()).all()
+        tasks = Task.objects(user=current_user, status=status_filter).order_by("-created_at")
+    else:
+        tasks = Task.objects(user=current_user).order_by("-created_at")
 
     return (
         jsonify(
             {
                 "tasks": [
                     {
-                        "id": task.id,
+                        "id": str(task.id),
                         "title": task.title,
                         "description": task.description,
                         "status": task.status,
@@ -147,18 +146,17 @@ def create_task():
     if status not in valid_statuses:
         return jsonify({"error": "Invalid status"}), 400
 
-    task = Task(title=title, description=description, status=status, user_id=current_user.id)
+    task = Task(title=title, description=description, status=status, user=current_user)
 
     try:
-        db.session.add(task)
-        db.session.commit()
+        task.save()
 
         return (
             jsonify(
                 {
                     "message": "Task created successfully",
                     "task": {
-                        "id": task.id,
+                        "id": str(task.id),
                         "title": task.title,
                         "description": task.description,
                         "status": task.status,
@@ -170,15 +168,14 @@ def create_task():
             201,
         )
     except Exception as e:
-        db.session.rollback()
         return jsonify({"error": "Failed to create task"}), 500
 
 
-@api_bp.route("/tasks/<int:task_id>", methods=["GET"])
+@api_bp.route("/tasks/<task_id>", methods=["GET"])
 @login_required
 def get_task(task_id):
     """Get a specific task"""
-    task = current_user.tasks.filter_by(id=task_id).first()
+    task = Task.objects(id=task_id, user=current_user).first()
 
     if not task:
         return jsonify({"error": "Task not found"}), 404
@@ -187,7 +184,7 @@ def get_task(task_id):
         jsonify(
             {
                 "task": {
-                    "id": task.id,
+                    "id": str(task.id),
                     "title": task.title,
                     "description": task.description,
                     "status": task.status,
@@ -200,11 +197,11 @@ def get_task(task_id):
     )
 
 
-@api_bp.route("/tasks/<int:task_id>", methods=["PUT"])
+@api_bp.route("/tasks/<task_id>", methods=["PUT"])
 @login_required
 def update_task(task_id):
     """Update a task"""
-    task = current_user.tasks.filter_by(id=task_id).first()
+    task = Task.objects(id=task_id, user=current_user).first()
 
     if not task:
         return jsonify({"error": "Task not found"}), 404
@@ -230,14 +227,14 @@ def update_task(task_id):
     task.updated_at = datetime.utcnow()
 
     try:
-        db.session.commit()
+        task.save()
 
         return (
             jsonify(
                 {
                     "message": "Task updated successfully",
                     "task": {
-                        "id": task.id,
+                        "id": str(task.id),
                         "title": task.title,
                         "description": task.description,
                         "status": task.status,
@@ -249,34 +246,31 @@ def update_task(task_id):
             200,
         )
     except Exception as e:
-        db.session.rollback()
         return jsonify({"error": "Failed to update task"}), 500
 
 
-@api_bp.route("/tasks/<int:task_id>", methods=["DELETE"])
+@api_bp.route("/tasks/<task_id>", methods=["DELETE"])
 @login_required
 def delete_task(task_id):
     """Delete a task"""
-    task = current_user.tasks.filter_by(id=task_id).first()
+    task = Task.objects(id=task_id, user=current_user).first()
 
     if not task:
         return jsonify({"error": "Task not found"}), 404
 
     try:
-        db.session.delete(task)
-        db.session.commit()
+        task.delete()
 
         return jsonify({"message": "Task deleted successfully"}), 200
     except Exception as e:
-        db.session.rollback()
         return jsonify({"error": "Failed to delete task"}), 500
 
 
-@api_bp.route("/tasks/<int:task_id>/status", methods=["PATCH"])
+@api_bp.route("/tasks/<task_id>/status", methods=["PATCH"])
 @login_required
 def update_task_status(task_id):
     """Update task status"""
-    task = current_user.tasks.filter_by(id=task_id).first()
+    task = Task.objects(id=task_id, user=current_user).first()
 
     if not task:
         return jsonify({"error": "Task not found"}), 404
@@ -294,14 +288,14 @@ def update_task_status(task_id):
     task.updated_at = datetime.utcnow()
 
     try:
-        db.session.commit()
+        task.save()
 
         return (
             jsonify(
                 {
                     "message": "Task status updated successfully",
                     "task": {
-                        "id": task.id,
+                        "id": str(task.id),
                         "title": task.title,
                         "description": task.description,
                         "status": task.status,
@@ -313,7 +307,6 @@ def update_task_status(task_id):
             200,
         )
     except Exception as e:
-        db.session.rollback()
         return jsonify({"error": "Failed to update task status"}), 500
 
 
@@ -322,12 +315,12 @@ def update_task_status(task_id):
 @login_required
 def get_dashboard():
     """Get dashboard statistics"""
-    total_tasks = current_user.tasks.count()
-    todo_tasks = current_user.tasks.filter_by(status="To Do").count()
-    in_progress_tasks = current_user.tasks.filter_by(status="In Progress").count()
-    completed_tasks = current_user.tasks.filter_by(status="Completed").count()
+    total_tasks = Task.objects(user=current_user).count()
+    todo_tasks = Task.objects(user=current_user, status="To Do").count()
+    in_progress_tasks = Task.objects(user=current_user, status="In Progress").count()
+    completed_tasks = Task.objects(user=current_user, status="Completed").count()
 
-    recent_tasks = current_user.tasks.order_by(Task.created_at.desc()).limit(5).all()
+    recent_tasks = Task.objects(user=current_user).order_by("-created_at").limit(5)
 
     return (
         jsonify(
@@ -339,7 +332,7 @@ def get_dashboard():
                     "completed": completed_tasks,
                 },
                 "recent_tasks": [
-                    {"id": task.id, "title": task.title, "status": task.status, "created_at": task.created_at.isoformat()}
+                    {"id": str(task.id), "title": task.title, "status": task.status, "created_at": task.created_at.isoformat()}
                     for task in recent_tasks
                 ],
             }

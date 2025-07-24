@@ -14,3 +14,25 @@ secret_key = "your-secure-flask-secret-key-here"
 # app_cpu = 256
 # app_memory = 512
 # app_desired_count = 1 
+
+# Azure Configuration
+azure_region = "eastus"
+
+# Environment
+environment = "production"
+
+# Project
+project_name = "taskflow"
+
+# Network Configuration
+vnet_address_space      = "10.0.0.0/16"
+private_subnet_prefixes = ["10.0.1.0/24"]
+public_subnet_prefixes  = ["10.0.101.0/24"]
+
+# Database Configuration
+db_sku_name = "B_Gen5_1"
+db_username = "taskflow"
+db_password = "your-secure-password-here"
+
+# Application Configuration
+secret_key = "your-secret-key-here" 

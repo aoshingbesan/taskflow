@@ -2,7 +2,7 @@ from flask import request, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_restx import Api, Resource, Namespace, fields
-from app.models import User, Task, db
+from app.models import User, Task
 from datetime import datetime
 
 # Create API instance
@@ -29,7 +29,7 @@ api.add_namespace(dashboard_ns)
 user_model = api.model(
     "User",
     {
-        "id": fields.Integer(readonly=True, description="User ID"),
+        "id": fields.String(readonly=True, description="User ID"),
         "username": fields.String(required=True, description="Username"),
         "email": fields.String(required=True, description="Email address"),
     },
@@ -55,7 +55,7 @@ user_login_model = api.model(
 task_model = api.model(
     "Task",
     {
-        "id": fields.Integer(readonly=True, description="Task ID"),
+        "id": fields.String(readonly=True, description="Task ID"),
         "title": fields.String(required=True, description="Task title"),
         "description": fields.String(description="Task description"),
         "status": fields.String(enum=["To Do", "In Progress", "Completed"], description="Task status"),
@@ -121,22 +121,21 @@ class UserRegister(Resource):
             api.abort(400, "Missing required fields")
 
         # Check if user already exists
-        if User.query.filter_by(username=username).first():
+        if User.objects(username=username).first():
             api.abort(409, "Username already exists")
 
-        if User.query.filter_by(email=email).first():
+        if User.objects(email=email).first():
             api.abort(409, "Email already exists")
 
         # Create new user
-        user = User(username=username, email=email, password_hash=generate_password_hash(password))
+        user = User(username=username, email=email)
+        user.set_password(password)
 
         try:
-            db.session.add(user)
-            db.session.commit()
+            user.save()
 
-            return {"id": user.id, "username": user.username, "email": user.email}, 201
+            return {"id": str(user.id), "username": user.username, "email": user.email}, 201
         except Exception as e:
-            db.session.rollback()
             api.abort(500, "Registration failed")
 
 
@@ -158,11 +157,11 @@ class UserLogin(Resource):
         if not all([username, password]):
             api.abort(400, "Missing username or password")
 
-        user = User.query.filter_by(username=username).first()
+        user = User.objects(username=username).first()
 
-        if user and check_password_hash(user.password_hash, password):
+        if user and user.check_password(password):
             login_user(user)
-            return {"id": user.id, "username": user.username, "email": user.email}
+            return {"id": str(user.id), "username": user.username, "email": user.email}
         else:
             api.abort(401, "Invalid username or password")
 
@@ -184,7 +183,7 @@ class CurrentUser(Resource):
     @login_required
     def get(self):
         """Get current user information"""
-        return {"id": current_user.id, "username": current_user.username, "email": current_user.email}
+        return {"id": str(current_user.id), "username": current_user.username, "email": current_user.email}
 
 
 # Task endpoints
@@ -197,16 +196,14 @@ class TaskList(Resource):
         """Get all tasks for current user"""
         status_filter = request.args.get("status")
 
-        query = current_user.tasks
-
         if status_filter:
-            query = query.filter_by(status=status_filter)
-
-        tasks = query.order_by(Task.created_at.desc()).all()
+            tasks = Task.objects(user=current_user, status=status_filter).order_by("-created_at")
+        else:
+            tasks = Task.objects(user=current_user).order_by("-created_at")
 
         return [
             {
-                "id": task.id,
+                "id": str(task.id),
                 "title": task.title,
                 "description": task.description,
                 "status": task.status,
@@ -238,14 +235,13 @@ class TaskList(Resource):
         if status not in valid_statuses:
             api.abort(400, "Invalid status")
 
-        task = Task(title=title, description=description, status=status, user_id=current_user.id)
+        task = Task(title=title, description=description, status=status, user=current_user)
 
         try:
-            db.session.add(task)
-            db.session.commit()
+            task.save()
 
             return {
-                "id": task.id,
+                "id": str(task.id),
                 "title": task.title,
                 "description": task.description,
                 "status": task.status,
@@ -253,24 +249,23 @@ class TaskList(Resource):
                 "updated_at": task.updated_at,
             }, 201
         except Exception as e:
-            db.session.rollback()
             api.abort(500, "Failed to create task")
 
 
-@tasks_ns.route("/<int:task_id>")
+@tasks_ns.route("/<task_id>")
 @tasks_ns.param("task_id", "The task identifier")
 class TaskResource(Resource):
     @tasks_ns.marshal_with(task_model)
     @login_required
     def get(self, task_id):
         """Get a specific task"""
-        task = current_user.tasks.filter_by(id=task_id).first()
+        task = Task.objects(id=task_id, user=current_user).first()
 
         if not task:
             api.abort(404, "Task not found")
 
         return {
-            "id": task.id,
+            "id": str(task.id),
             "title": task.title,
             "description": task.description,
             "status": task.status,
@@ -283,7 +278,7 @@ class TaskResource(Resource):
     @login_required
     def put(self, task_id):
         """Update a task"""
-        task = current_user.tasks.filter_by(id=task_id).first()
+        task = Task.objects(id=task_id, user=current_user).first()
 
         if not task:
             api.abort(404, "Task not found")
@@ -309,10 +304,10 @@ class TaskResource(Resource):
         task.updated_at = datetime.utcnow()
 
         try:
-            db.session.commit()
+            task.save()
 
             return {
-                "id": task.id,
+                "id": str(task.id),
                 "title": task.title,
                 "description": task.description,
                 "status": task.status,
@@ -320,28 +315,25 @@ class TaskResource(Resource):
                 "updated_at": task.updated_at,
             }
         except Exception as e:
-            db.session.rollback()
             api.abort(500, "Failed to update task")
 
     @login_required
     def delete(self, task_id):
         """Delete a task"""
-        task = current_user.tasks.filter_by(id=task_id).first()
+        task = Task.objects(id=task_id, user=current_user).first()
 
         if not task:
             api.abort(404, "Task not found")
 
         try:
-            db.session.delete(task)
-            db.session.commit()
+            task.delete()
 
             return {"message": "Task deleted successfully"}
         except Exception as e:
-            db.session.rollback()
             api.abort(500, "Failed to delete task")
 
 
-@tasks_ns.route("/<int:task_id>/status")
+@tasks_ns.route("/<task_id>/status")
 @tasks_ns.param("task_id", "The task identifier")
 class TaskStatus(Resource):
     @tasks_ns.expect(status_update_model)
@@ -349,7 +341,7 @@ class TaskStatus(Resource):
     @login_required
     def patch(self, task_id):
         """Update task status"""
-        task = current_user.tasks.filter_by(id=task_id).first()
+        task = Task.objects(id=task_id, user=current_user).first()
 
         if not task:
             api.abort(404, "Task not found")
@@ -367,10 +359,10 @@ class TaskStatus(Resource):
         task.updated_at = datetime.utcnow()
 
         try:
-            db.session.commit()
+            task.save()
 
             return {
-                "id": task.id,
+                "id": str(task.id),
                 "title": task.title,
                 "description": task.description,
                 "status": task.status,
@@ -378,7 +370,6 @@ class TaskStatus(Resource):
                 "updated_at": task.updated_at,
             }
         except Exception as e:
-            db.session.rollback()
             api.abort(500, "Failed to update task status")
 
 
@@ -389,12 +380,12 @@ class Dashboard(Resource):
     @login_required
     def get(self):
         """Get dashboard statistics"""
-        total_tasks = current_user.tasks.count()
-        todo_tasks = current_user.tasks.filter_by(status="To Do").count()
-        in_progress_tasks = current_user.tasks.filter_by(status="In Progress").count()
-        completed_tasks = current_user.tasks.filter_by(status="Completed").count()
+        total_tasks = Task.objects(user=current_user).count()
+        todo_tasks = Task.objects(user=current_user, status="To Do").count()
+        in_progress_tasks = Task.objects(user=current_user, status="In Progress").count()
+        completed_tasks = Task.objects(user=current_user, status="Completed").count()
 
-        recent_tasks = current_user.tasks.order_by(Task.created_at.desc()).limit(5).all()
+        recent_tasks = Task.objects(user=current_user).order_by("-created_at").limit(5)
 
         return {
             "stats": {
@@ -404,7 +395,7 @@ class Dashboard(Resource):
                 "completed": completed_tasks,
             },
             "recent_tasks": [
-                {"id": task.id, "title": task.title, "status": task.status, "created_at": task.created_at.isoformat()}
+                {"id": str(task.id), "title": task.title, "status": task.status, "created_at": task.created_at.isoformat()}
                 for task in recent_tasks
             ],
         }

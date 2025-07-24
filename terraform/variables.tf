@@ -1,7 +1,7 @@
-variable "aws_region" {
-  description = "AWS region"
+variable "azure_region" {
+  description = "Azure region"
   type        = string
-  default     = "us-east-1"
+  default     = "eastus"
 }
 
 variable "environment" {
@@ -16,34 +16,28 @@ variable "project_name" {
   default     = "taskflow"
 }
 
-variable "vpc_cidr" {
-  description = "CIDR block for VPC"
+variable "vnet_address_space" {
+  description = "Address space for Virtual Network"
   type        = string
   default     = "10.0.0.0/16"
 }
 
-variable "availability_zones" {
-  description = "Availability zones"
+variable "private_subnet_prefixes" {
+  description = "Address prefixes for private subnets"
   type        = list(string)
-  default     = ["us-east-1a", "us-east-1b"]
+  default     = ["10.0.1.0/24"]
 }
 
-variable "private_subnet_cidrs" {
-  description = "CIDR blocks for private subnets"
+variable "public_subnet_prefixes" {
+  description = "Address prefixes for public subnets"
   type        = list(string)
-  default     = ["10.0.1.0/24", "10.0.2.0/24"]
+  default     = ["10.0.101.0/24"]
 }
 
-variable "public_subnet_cidrs" {
-  description = "CIDR blocks for public subnets"
-  type        = list(string)
-  default     = ["10.0.101.0/24", "10.0.102.0/24"]
-}
-
-variable "db_instance_class" {
-  description = "RDS instance class"
+variable "db_sku_name" {
+  description = "PostgreSQL Flexible Server SKU name"
   type        = string
-  default     = "db.t3.micro"
+  default     = "B_Standard_B1ms"
 }
 
 variable "db_username" {
@@ -80,4 +74,10 @@ variable "app_desired_count" {
   description = "Desired number of app instances"
   type        = number
   default     = 1
+}
+
+variable "mongodb_uri" {
+  description = "MongoDB Atlas connection string"
+  type        = string
+  sensitive   = true
 } 
