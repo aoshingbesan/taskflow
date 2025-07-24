@@ -90,12 +90,7 @@ def logout():
 @login_required
 def get_current_user():
     """Get current user information"""
-    return (
-        jsonify(
-            {"user": {"id": current_user.id, "username": current_user.username, "email": current_user.email}}
-        ),
-        200,
-    )
+    return jsonify({"user": {"id": current_user.id, "username": current_user.username, "email": current_user.email}}), 200
 
 
 # Task endpoints

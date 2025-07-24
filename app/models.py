@@ -16,7 +16,7 @@ def load_user(id):
 
 class User(UserMixin, Document):
     meta = {"collection": "users"}
-    
+
     username = StringField(max_length=64, unique=True, required=True)
     email = StringField(max_length=120, unique=True, required=True)
     password_hash = StringField(max_length=128)
@@ -34,7 +34,6 @@ class User(UserMixin, Document):
 
 class Task(Document):
     meta = {"collection": "tasks"}
-    
     title = StringField(max_length=100, required=True)
     description = StringField()
     status = StringField(max_length=20, default="To Do")  # To Do, In Progress, Completed
