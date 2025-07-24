@@ -86,12 +86,8 @@ class TestTask:
                 task1.save()
                 task2.save()
 
-                # Mock the query operations
-                with patch("mongoengine.QuerySet.count") as mock_count:
-                    with patch("mongoengine.QuerySet.__contains__") as mock_contains:
-                        mock_count.return_value = 2
-                        mock_contains.side_effect = lambda x: x in [task1, task2]
-
-                        # This would normally query the database, but we're mocking it
-                        assert task1.user == user
-                        assert task2.user == user
+                # Test the relationship without database queries
+                assert task1.user == user
+                assert task2.user == user
+                assert task1.title == "Task 1"
+                assert task2.title == "Task 2"
