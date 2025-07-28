@@ -248,3 +248,4 @@ def init_monitoring_dashboard(app):
         return jsonify({"error": "Internal server error"}), 500
 
     app.logger.info("Monitoring dashboard initialized") 
+

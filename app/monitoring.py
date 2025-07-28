@@ -69,7 +69,9 @@ def log_response_info(response):
 def log_error(error):
     """Log error information with context."""
     if isinstance(error, HTTPException):
-        current_app.logger.error(f"HTTP Error {error.code}: {error.description} - " f"Path: {request.path if request else 'Unknown'}")
+        current_app.logger.error(
+            f"HTTP Error {error.code}: {error.description} - " f"Path: {request.path if request else 'Unknown'}"
+        )
     else:
         current_app.logger.error(f"Application Error: {str(error)} - " f"Path: {request.path if request else 'Unknown'}")
 
@@ -239,3 +241,4 @@ def init_monitoring(app):
     current_app.logger.info("Monitoring system initialized")
 
     return health_monitor 
+
