@@ -12,7 +12,7 @@ This module provides a comprehensive monitoring dashboard with:
 import json
 import time
 from datetime import datetime, timedelta
-from flask import Blueprint, render_template, jsonify, request
+from flask import Blueprint, render_template, jsonify, request, g
 from flask_login import login_required, current_user
 from app.monitoring import log_user_activity, log_api_usage
 
