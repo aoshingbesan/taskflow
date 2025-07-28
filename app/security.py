@@ -114,35 +114,34 @@ def validate_password(password):
 
 def rate_limit(limit=100, window=3600):
     """Rate limiting decorator."""
+
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
             # Get client identifier
             client_id = request.remote_addr
-            if current_user.is_authenticated:
-                client_id = f"{client_id}:{current_user.id}"
+            key = f"rate_limit:{client_id}:{f.__name__}"
 
-            # Check rate limit
+            # Get current time
             current_time = time.time()
-            key = f"{client_id}:{f.__name__}"
 
+            # Get existing rate limit data
             if key in _rate_limit_storage:
                 requests, window_start = _rate_limit_storage[key]
 
-                # Reset window if expired
+                # Check if window has expired
                 if current_time - window_start > window:
                     requests = 0
                     window_start = current_time
 
                 # Check if limit exceeded
                 if requests >= limit:
-                    current_app.logger.warning(
-                        f"Rate limit exceeded for {client_id} on {f.__name__}"
-                    )
-                    return jsonify({
-                        "error": "Rate limit exceeded",
-                        "retry_after": window - (current_time - window_start),
-                    }), 429
+                    return jsonify(
+                        {
+                            "error": "Rate limit exceeded",
+                            "retry_after": window - (current_time - window_start),
+                        }
+                    ), 429
 
                 requests += 1
             else:
@@ -152,23 +151,28 @@ def rate_limit(limit=100, window=3600):
             _rate_limit_storage[key] = (requests, window_start)
 
             return f(*args, **kwargs)
+
         return decorated_function
+
     return decorator
 
 
 def require_authentication(f):
     """Decorator to require user authentication."""
+
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated:
             return jsonify({"error": "Authentication required"}), 401
         return f(*args, **kwargs)
+
     return decorated_function
 
 
 def log_security_event(event_type, details):
     """Log security events for monitoring."""
     from app.monitoring import log_security_event as log_sec_event
+
     log_sec_event(event_type, details)
 
 
