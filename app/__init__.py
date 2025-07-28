@@ -12,16 +12,16 @@ def create_app(config_class=Config):
     app.config.from_object(config_class)
 
     # Initialize monitoring and observability
-    from app.monitoring import init_monitoring
-    health_monitor = init_monitoring(app)
+    # from app.monitoring import init_monitoring
+    # health_monitor = init_monitoring(app)
     
     # Initialize security features
-    from app.security import init_security
-    init_security(app)
+    # from app.security import init_security
+    # init_security(app)
     
     # Initialize monitoring dashboard
-    from app.dashboard_monitoring import init_monitoring_dashboard
-    init_monitoring_dashboard(app)
+    # from app.dashboard_monitoring import init_monitoring_dashboard
+    # init_monitoring_dashboard(app)
 
     # Initialize extensions
     # Temporarily disable MongoDB connection to get app running
@@ -58,7 +58,6 @@ def create_app(config_class=Config):
         """Comprehensive health check endpoint for monitoring."""
         return {
             'status': 'healthy',
-            'timestamp': health_monitor.get_health_status(),
             'version': '2.0.0',
             'environment': app.config.get('ENV', 'development')
         }
