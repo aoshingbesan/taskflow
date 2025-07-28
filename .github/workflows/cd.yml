@@ -156,7 +156,6 @@ jobs:
       with:
         app-name: 'taskflow-staging'
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_STAGING }}
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
   # Deploy to Production (Only for main branch)
   deploy-production:
@@ -172,7 +171,6 @@ jobs:
       with:
         app-name: 'taskflow-app'
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
     
     - name: Health Check Production
       run: |
