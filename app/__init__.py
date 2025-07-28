@@ -38,10 +38,4 @@ def create_app(config_class=Config):
     # Initialize Swagger API
     swagger_api.init_app(app)
 
-    # Add health check endpoint
-    @app.route("/health")
-    def health_check():
-        """Comprehensive health check endpoint for monitoring."""
-        return {"status": "healthy", "version": "2.0.0", "environment": app.config.get("ENV", "development")}
-
     return app
