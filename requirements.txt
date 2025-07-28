@@ -13,4 +13,8 @@ pytest-cov==4.1.0
 black==23.9.1
 flake8==6.1.0
 gunicorn==21.2.0
-redis==5.0.1 
+redis==5.0.1
+# Security scanning tools for DevSecOps
+safety==2.3.5
+bandit==1.7.5
+bleach==6.1.0 
