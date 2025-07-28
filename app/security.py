@@ -275,4 +275,3 @@ def init_security(app):
         return add_security_headers(response)
 
     current_app.logger.info("Security features initialized") 
-
