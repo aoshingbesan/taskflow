@@ -136,12 +136,15 @@ def rate_limit(limit=100, window=3600):
 
                 # Check if limit exceeded
                 if requests >= limit:
-                    return jsonify(
-                        {
-                            "error": "Rate limit exceeded",
-                            "retry_after": window - (current_time - window_start),
-                        }
-                    ), 429
+                    return (
+                        jsonify(
+                            {
+                                "error": "Rate limit exceeded",
+                                "retry_after": window - (current_time - window_start),
+                            }
+                        ),
+                        429,
+                    )
 
                 requests += 1
             else:

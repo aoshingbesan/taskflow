@@ -242,11 +242,11 @@ def init_monitoring_dashboard(app):
             duration = time.time() - g.request_start_time
             record_request(request.endpoint or "unknown", request.method, response.status_code, duration)
         return response
-    
+
     # Register error logging
     @app.errorhandler(Exception)
     def handle_exception(e):
         record_error(type(e).__name__, str(e), request.endpoint if request else None)
         return jsonify({"error": "Internal server error"}), 500
-    
+
     app.logger.info("Monitoring dashboard initialized") 
