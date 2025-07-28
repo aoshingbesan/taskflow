@@ -240,4 +240,4 @@ def init_monitoring(app):
 
     current_app.logger.info("Monitoring system initialized")
 
-    return health_monitor 
+    return health_monitor

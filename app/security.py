@@ -274,4 +274,4 @@ def init_security(app):
         """Add security headers after each request."""
         return add_security_headers(response)
 
-    current_app.logger.info("Security features initialized") 
+    current_app.logger.info("Security features initialized")

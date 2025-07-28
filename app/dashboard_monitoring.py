@@ -247,4 +247,4 @@ def init_monitoring_dashboard(app):
         record_error(type(e).__name__, str(e), request.endpoint if request else None)
         return jsonify({"error": "Internal server error"}), 500
 
-    app.logger.info("Monitoring dashboard initialized") 
+    app.logger.info("Monitoring dashboard initialized")
