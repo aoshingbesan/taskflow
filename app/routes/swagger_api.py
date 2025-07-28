@@ -407,3 +407,9 @@ class HealthCheck(Resource):
     def get(self):
         """API health check"""
         return {"status": "healthy", "service": "taskflow-api", "version": "1.0.0"}
+
+
+def init_app(app):
+    """Initialize the Swagger API with the Flask app."""
+    api.init_app(app)
+    return api
