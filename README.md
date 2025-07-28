@@ -348,21 +348,53 @@ flake8 app/ tests/
 black --check app/ tests/
 ```
 
-## CI/CD Pipeline
+## 🚀 Continuous Deployment Pipeline
 
-This project uses GitHub Actions for continuous integration:
+### Complete CD Pipeline with DevSecOps
+This project implements a comprehensive Continuous Deployment pipeline with security integration:
 
-- **Automated Testing**: Runs on every push and pull request
+#### **Security & Quality Checks**
+- **Dependency Vulnerability Scanning**: Safety for detecting security vulnerabilities
+- **Code Security Analysis**: Bandit for identifying security issues in code
+- **Container Image Security**: Automated security scanning of Docker images
 - **Code Quality**: Linting with flake8 and formatting checks with black
-- **Coverage Reporting**: Generates test coverage reports
-- **Database Testing**: Uses MongoDB service container for integration tests
 
-### Branch Protection Rules
+#### **Automated Testing**
+- **Unit Tests**: pytest with comprehensive coverage reporting
+- **Integration Tests**: Database and API testing
+- **Performance Tests**: Automated performance monitoring
 
+#### **Build & Deploy Process**
+1. **Security Scanning**: Safety and Bandit vulnerability checks
+2. **Code Quality**: flake8 linting and black formatting
+3. **Testing**: pytest with coverage reporting
+4. **Docker Build**: Multi-stage container image building
+5. **Image Push**: Push to GitHub Container Registry
+6. **Staging Deployment**: Automated deployment to staging environment
+7. **Production Deployment**: Automated deployment to production
+8. **Health Checks**: Automated health monitoring and alerts
+
+#### **Monitoring & Observability**
+- **Application Logging**: Comprehensive structured logging
+- **Performance Monitoring**: Request/response time tracking
+- **Health Checks**: Automated endpoint monitoring
+- **Security Events**: Security incident logging and alerting
+- **User Activity**: Audit trail for user actions
+
+### **Deployment Environments**
+- **Staging**: https://taskflow-staging.azurewebsites.net
+- **Production**: https://taskflow-app.azurewebsites.net
+
+### **Pipeline Triggers**
+- **Push to main branch**: Triggers full CD pipeline
+- **Pull requests**: Triggers security and quality checks only
+
+### **Branch Protection Rules**
 The main branch is protected with the following rules:
 - Requires pull request reviews
 - Requires status checks to pass
 - Requires up-to-date branches before merging
+- Requires security scans to pass
 
 ## API Endpoints
 

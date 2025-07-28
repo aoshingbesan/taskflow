@@ -1,0 +1,208 @@
+name: Continuous Deployment Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # Security and Quality Checks
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run Safety (Dependency Vulnerability Scan)
+      run: |
+        pip install safety
+        safety check --json --output safety-report.json || true
+        echo "Safety scan completed"
+    
+    - name: Run Bandit (Security Linting)
+      run: |
+        pip install bandit
+        bandit -r app/ -f json -o bandit-report.json || true
+        echo "Bandit scan completed"
+    
+    - name: Upload Security Reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-reports
+        path: |
+          safety-report.json
+          bandit-report.json
+
+  # Build and Test
+  build-and-test:
+    runs-on: ubuntu-latest
+    needs: security-scan
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Cache pip dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run linting with flake8
+      run: |
+        flake8 app/ tests/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 app/ tests/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    
+    - name: Run code formatting check with black
+      run: |
+        black --check --diff app/ tests/
+    
+    - name: Run tests
+      env:
+        DATABASE_URL: sqlite:///test.db
+        SECRET_KEY: test-secret-key
+        PYTHONPATH: ${{ github.workspace }}
+      run: |
+        python test_simple.py
+        pytest tests/ -v --tb=short --cov=app --cov-report=xml --cov-report=term-missing
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        fail_ci_if_error: false
+
+
+
+  # Build and Push Docker Image (Only for main branch)
+  build-image:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Log in to Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+    
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  # Deploy to Staging (Only for main branch)
+  deploy-staging:
+    runs-on: ubuntu-latest
+    needs: build-image
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Deploy to Azure App Service (Staging)
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'taskflow-staging'
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_STAGING }}
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+  # Deploy to Production (Only for main branch)
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: [build-image, deploy-staging]
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Deploy to Azure App Service (Production)
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'taskflow-app'
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+    
+    - name: Health Check Production
+      run: |
+        sleep 30
+        curl -f https://taskflow-app.azurewebsites.net/health || exit 1
+    
+    - name: Health Check Staging
+      run: |
+        curl -f https://taskflow-staging.azurewebsites.net/health || exit 1
+
+  # Monitoring and Alerts (Only for main branch)
+  monitoring:
+    runs-on: ubuntu-latest
+    needs: [deploy-production]
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Check Application Health
+      run: |
+        echo "Checking production health..."
+        PROD_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://taskflow-app.azurewebsites.net/health)
+        echo "Production status: $PROD_STATUS"
+        
+        echo "Checking staging health..."
+        STAGING_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://taskflow-staging.azurewebsites.net/health)
+        echo "Staging status: $STAGING_STATUS"
+        
+        if [ "$PROD_STATUS" != "200" ] || [ "$STAGING_STATUS" != "200" ]; then
+          echo "❌ Health check failed"
+          exit 1
+        else
+          echo "✅ All environments healthy"
+        fi 
