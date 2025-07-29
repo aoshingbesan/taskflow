@@ -11,6 +11,7 @@ login_manager = LoginManager()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 # Create a dummy db object for imports
 class DummyDB:
     pass
@@ -36,7 +37,7 @@ def create_app(config_class=Config):
                 host=mongodb_uri,
                 serverSelectionTimeoutMS=10000,  # 10 second timeout
                 connectTimeoutMS=10000,
-                socketTimeoutMS=10000
+                socketTimeoutMS=10000,
             )
             logger.info("MongoDB connected successfully")
             app.logger.info("MongoDB connected successfully")
