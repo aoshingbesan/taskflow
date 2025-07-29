@@ -10,6 +10,12 @@ login_manager = LoginManager()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Create a dummy db object for imports
+class DummyDB:
+    pass
+
+db = DummyDB()
+
 
 def create_app(config_class=Config):
     app = Flask(__name__)
