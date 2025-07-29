@@ -156,6 +156,12 @@ jobs:
     
     - name: Azure Login
       run: |
+        echo "Debug: Checking if secrets are available..."
+        echo "Client ID length: ${#AZURE_CLIENT_ID}"
+        echo "Tenant ID length: ${#AZURE_TENANT_ID}"
+        echo "Subscription ID length: ${#AZURE_SUBSCRIPTION_ID}"
+        echo "Client Secret length: ${#AZURE_CLIENT_SECRET}"
+        
         echo "Logging in with service principal..."
         az login --service-principal --username "${{ secrets.AZURE_CLIENT_ID }}" --password "${{ secrets.AZURE_CLIENT_SECRET }}" --tenant "${{ secrets.AZURE_TENANT_ID }}"
         echo "Setting subscription..."
