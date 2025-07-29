@@ -15,7 +15,7 @@ def index():
 @main_bp.route("/health")
 def health():
     """Health check endpoint for container orchestration"""
-    return jsonify({"status": "healthy", "service": "taskflow"})
+    return jsonify({"status": "healthy", "message": "TaskFlow is running!"})
 
 
 @main_bp.route("/dashboard")

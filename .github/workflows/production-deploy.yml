@@ -1,10 +1,13 @@
-name: Continuous Deployment Pipeline
+name: Production Deployment Pipeline
 
 on:
-  push:
-    branches: [ main, develop ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
+  workflow_run:
+    workflows: ["Staging Deployment Pipeline"]
+    types:
+      - completed
+    branches: [ develop ]
 
 env:
   REGISTRY: ghcr.io
@@ -42,7 +45,7 @@ jobs:
     - name: Upload Security Reports
       uses: actions/upload-artifact@v4
       with:
-        name: security-reports
+        name: security-reports-production
         path: |
           safety-report.json
           bandit-report.json
@@ -97,13 +100,11 @@ jobs:
         file: ./coverage.xml
         fail_ci_if_error: false
 
-
-
   # Build and Push Docker Image (Only for main branch)
   build-image:
     runs-on: ubuntu-latest
     needs: build-and-test
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'pull_request' && github.base_ref == 'main'
     permissions:
       contents: read
       packages: write
@@ -127,10 +128,9 @@ jobs:
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         tags: |
-          type=ref,event=branch
           type=ref,event=pr
-          type=sha,prefix={{branch}}-
-          type=raw,value=latest,enable={{is_default_branch}}
+          type=sha,prefix=pr-
+          type=raw,value=production,enable={{is_default_branch}}
     
     - name: Build and push Docker image
       uses: docker/build-push-action@v4
@@ -142,53 +142,92 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
-  # Deploy to Staging (Only for main branch)
-  deploy-staging:
-    runs-on: ubuntu-latest
-    needs: build-image
-    if: github.ref == 'refs/heads/main'
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Deploy to Azure App Service (Staging)
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: 'taskflow-staging'
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_STAGING }}
-
-  # Deploy to Production (Only for main branch)
+  # Deploy to Production (Only for main branch PRs)
   deploy-production:
     runs-on: ubuntu-latest
-    needs: [build-image, deploy-staging]
-    if: github.ref == 'refs/heads/main'
+    needs: build-and-test
+    if: github.event_name == 'pull_request' && github.base_ref == 'main'
+    permissions:
+      contents: read
+      id-token: write
     
     steps:
     - uses: actions/checkout@v4
+    
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
     
     - name: Deploy to Azure App Service (Production)
       uses: azure/webapps-deploy@v2
       with:
         app-name: 'taskflow-app'
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        package: .
     
     - name: Health Check Production
       run: |
         sleep 30
         curl -f https://taskflow-app.azurewebsites.net/health || exit 1
-    
-    - name: Health Check Staging
-      run: |
-        curl -f https://taskflow-staging.azurewebsites.net/health || exit 1
 
-  # Monitoring and Alerts (Only for main branch)
-  monitoring:
+  # Production Monitoring
+  production-monitoring:
     runs-on: ubuntu-latest
     needs: [deploy-production]
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'pull_request' && github.base_ref == 'main'
     
     steps:
-    - name: Check Application Health
+    - name: Check Production Health
+      run: |
+        echo "Checking production health..."
+        PROD_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://taskflow-app.azurewebsites.net/health)
+        echo "Production status: $PROD_STATUS"
+        
+        if [ "$PROD_STATUS" != "200" ]; then
+          echo "❌ Production health check failed"
+          exit 1
+        else
+          echo "✅ Production environment healthy"
+        fi
+
+  # Deploy to Production from Staging (Alternative trigger)
+  deploy-production-from-staging:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
+    permissions:
+      contents: read
+      id-token: write
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Deploy to Azure App Service (Production)
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'taskflow-app'
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        package: .
+    
+    - name: Health Check Production
+      run: |
+        sleep 30
+        curl -f https://taskflow-app.azurewebsites.net/health || exit 1
+
+  # Final Production Monitoring
+  final-production-monitoring:
+    runs-on: ubuntu-latest
+    needs: [deploy-production, deploy-production-from-staging]
+    if: always()
+    
+    steps:
+    - name: Check All Environments Health
       run: |
         echo "Checking production health..."
         PROD_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://taskflow-app.azurewebsites.net/health)
