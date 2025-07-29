@@ -17,18 +17,6 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    # Initialize monitoring and observability
-    # from app.monitoring import init_monitoring
-    # health_monitor = init_monitoring(app)
-
-    # Initialize security features
-    # from app.security import init_security
-    # init_security(app)
-
-    # Initialize monitoring dashboard
-    # from app.dashboard_monitoring import init_monitoring_dashboard
-    # init_monitoring_dashboard(app)
-
     # Initialize extensions
     login_manager.init_app(app)
     login_manager.login_view = "auth.login"
@@ -40,9 +28,9 @@ def create_app(config_class=Config):
             # Set connection timeout and retry settings
             mongoengine.connect(
                 host=mongodb_uri,
-                serverSelectionTimeoutMS=5000,  # 5 second timeout
-                connectTimeoutMS=5000,
-                socketTimeoutMS=5000
+                serverSelectionTimeoutMS=10000,  # 10 second timeout
+                connectTimeoutMS=10000,
+                socketTimeoutMS=10000
             )
             logger.info("MongoDB connected successfully")
             app.logger.info("MongoDB connected successfully")
@@ -71,5 +59,6 @@ def create_app(config_class=Config):
     except Exception as e:
         logger.error(f"Error registering blueprints: {e}")
         app.logger.error(f"Error registering blueprints: {e}")
+        # Continue without some blueprints if there are issues
 
     return app
