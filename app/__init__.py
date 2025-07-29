@@ -29,7 +29,7 @@ def create_app(config_class=Config):
     login_manager.login_view = "auth.login"
 
     # Initialize MongoDB only if URI is provided
-    mongodb_uri = os.environ.get('MONGODB_URI')
+    mongodb_uri = os.environ.get("MONGODB_URI")
     if mongodb_uri and mongodb_uri != "mongodb://localhost:27017/taskflow":
         try:
             mongoengine.connect(host=mongodb_uri)
