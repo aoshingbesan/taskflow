@@ -10,13 +10,13 @@ Go to your GitHub repository → **Settings** → **Secrets and variables** → 
 
 #### **Secret: AZURE_CREDENTIALS**
 **Name:** `AZURE_CREDENTIALS`
-**Value:**
+**Value:** *(Use the JSON format with your actual credentials)*
 ```json
 {
-  "clientId": "6e121fd7-9319-423d-b82d-839e9edc60d2",
-  "clientSecret": "I6w8Q~sje2ZT0fL9ldGtNtP6hIKnic-36LxJubF~",
-  "subscriptionId": "55862e95-58fc-4f2c-99a5-1c70e635080c",
-  "tenantId": "7807bad4-75db-4549-bdcd-071a067191e2"
+  "clientId": "your-client-id",
+  "clientSecret": "your-client-secret",
+  "subscriptionId": "your-subscription-id",
+  "tenantId": "your-tenant-id"
 }
 ```
 
