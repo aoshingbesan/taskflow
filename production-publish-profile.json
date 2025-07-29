@@ -1,0 +1,65 @@
+{
+  "publishData": {
+    "publishProfiles": [
+      {
+        "profileName": "taskflow-app - Web Deploy",
+        "publishMethod": "MSDeploy",
+        "publishUrl": "taskflow-app.scm.azurewebsites.net:443",
+        "msdeploySite": "taskflow-app",
+        "userName": "$taskflow-app",
+        "userPWD": "j2qi03Xb8maByZ596b0W5A0krt5aibr5krN1BH0MeMa5tHleEvme9Nwh5Xmt",
+        "destinationAppUrl": "http://taskflow-app.azurewebsites.net",
+        "SQLServerDBConnectionString": "",
+        "mySQLDBConnectionString": "",
+        "hostingProviderForumLink": "",
+        "controlPanelLink": "https://portal.azure.com",
+        "webSystem": "WebSites",
+        "databases": []
+      },
+      {
+        "profileName": "taskflow-app - FTP",
+        "publishMethod": "FTP",
+        "publishUrl": "ftp://waws-prod-blu-125.ftp.azurewebsites.windows.net/site/wwwroot",
+        "ftpPassiveMode": "True",
+        "userName": "taskflow-app\\$taskflow-app",
+        "userPWD": "j2qi03Xb8maByZ596b0W5A0krt5aibr5krN1BH0MeMa5tHleEvme9Nwh5Xmt",
+        "destinationAppUrl": "http://taskflow-app.azurewebsites.net",
+        "SQLServerDBConnectionString": "",
+        "mySQLDBConnectionString": "",
+        "hostingProviderForumLink": "",
+        "controlPanelLink": "https://portal.azure.com",
+        "webSystem": "WebSites",
+        "databases": []
+      },
+      {
+        "profileName": "taskflow-app - Zip Deploy",
+        "publishMethod": "ZipDeploy",
+        "publishUrl": "taskflow-app.scm.azurewebsites.net:443",
+        "userName": "$taskflow-app",
+        "userPWD": "j2qi03Xb8maByZ596b0W5A0krt5aibr5krN1BH0MeMa5tHleEvme9Nwh5Xmt",
+        "destinationAppUrl": "http://taskflow-app.azurewebsites.net",
+        "SQLServerDBConnectionString": "",
+        "mySQLDBConnectionString": "",
+        "hostingProviderForumLink": "",
+        "controlPanelLink": "https://portal.azure.com",
+        "webSystem": "WebSites",
+        "databases": []
+      },
+      {
+        "profileName": "taskflow-app - ReadOnly - FTP",
+        "publishMethod": "FTP",
+        "publishUrl": "ftp://waws-prod-blu-125dr.ftp.azurewebsites.windows.net/site/wwwroot",
+        "ftpPassiveMode": "True",
+        "userName": "taskflow-app\\$taskflow-app",
+        "userPWD": "j2qi03Xb8maByZ596b0W5A0krt5aibr5krN1BH0MeMa5tHleEvme9Nwh5Xmt",
+        "destinationAppUrl": "http://taskflow-app.azurewebsites.net",
+        "SQLServerDBConnectionString": "",
+        "mySQLDBConnectionString": "",
+        "hostingProviderForumLink": "",
+        "controlPanelLink": "https://portal.azure.com",
+        "webSystem": "WebSites",
+        "databases": []
+      }
+    ]
+  }
+} 

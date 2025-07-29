@@ -1,0 +1,18 @@
+# Azure App Service Environment Variables
+# These should be configured in Azure App Service Configuration
+
+# Flask Configuration
+SECRET_KEY=your-super-secret-key-change-this-in-production
+FLASK_ENV=production
+FLASK_APP=main_app.py
+
+# MongoDB Atlas Configuration
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database?retryWrites=true&w=majority
+
+# Azure App Service Configuration
+WEBSITES_PORT=8000
+SCM_DO_BUILD_DURING_DEPLOYMENT=true
+PYTHONPATH=/home/site/wwwroot
+
+# Application Configuration
+PORT=8000 
