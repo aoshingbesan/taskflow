@@ -446,3 +446,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 This project was created as part of an Advanced DevOps course assignment. # Test staging deployment - Tue Jul 29 19:45:29 CAT 2025
 # Trigger new deployment - Tue Jul 29 19:55:28 CAT 2025
 # Test deployment with updated credentials - Tue Jul 29 20:12:50 CAT 2025
+# Test deployment with corrected Azure credentials - Tue Jul 29 20:24:20 CAT 2025
