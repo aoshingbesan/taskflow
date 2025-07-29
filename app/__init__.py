@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_login import LoginManager
 from config import Config
+import mongoengine
 import os
 import logging
 
@@ -10,13 +11,12 @@ login_manager = LoginManager()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
 # Create a dummy db object for imports
 class DummyDB:
     pass
 
 
-db = DummyDB()
+db = mongoengine
 
 
 def create_app(config_class=Config):
@@ -27,9 +27,26 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
     login_manager.login_view = "auth.login"
 
-    # Skip MongoDB for now to get basic app working
-    logger.info("Starting TaskFlow application without MongoDB")
-    app.logger.info("Starting TaskFlow application without MongoDB")
+    # Initialize MongoDB only if URI is provided
+    mongodb_uri = os.environ.get("MONGODB_URI")
+    if mongodb_uri and mongodb_uri != "mongodb://localhost:27017/taskflow":
+        try:
+            # Set connection timeout and retry settings
+            mongoengine.connect(
+                host=mongodb_uri,
+                serverSelectionTimeoutMS=10000,  # 10 second timeout
+                connectTimeoutMS=10000,
+                socketTimeoutMS=10000
+            )
+            logger.info("MongoDB connected successfully")
+            app.logger.info("MongoDB connected successfully")
+        except Exception as e:
+            logger.warning(f"MongoDB connection failed: {e}")
+            app.logger.warning(f"MongoDB connection failed: {e}")
+            # Continue without MongoDB - app will work with in-memory storage
+    else:
+        logger.info("MongoDB connection skipped - using in-memory storage")
+        app.logger.info("MongoDB connection skipped - using in-memory storage")
 
     # Register blueprints
     try:

@@ -1,45 +1,14 @@
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from mongoengine import Document, StringField, DateTimeField, ReferenceField, ObjectIdField
 from bson import ObjectId
-
-# Try to import MongoDB components, fall back to dummy classes if not available
-try:
-    from mongoengine import Document, StringField, DateTimeField, ReferenceField, ObjectIdField
-
-    MONGODB_AVAILABLE = True
-except ImportError:
-    MONGODB_AVAILABLE = False
-
-    # Create dummy classes
-    class Document:
-        def __init__(self, **kwargs):
-            pass
-
-    class StringField:
-        def __init__(self, **kwargs):
-            pass
-
-    class DateTimeField:
-        def __init__(self, **kwargs):
-            pass
-
-    class ReferenceField:
-        def __init__(self, **kwargs):
-            pass
-
-    class ObjectIdField:
-        def __init__(self, **kwargs):
-            pass
-
 
 from app import db, login_manager
 
 
 @login_manager.user_loader
 def load_user(id):
-    if not MONGODB_AVAILABLE:
-        return None
     try:
         return User.objects(id=ObjectId(id)).first()
     except:
@@ -47,8 +16,7 @@ def load_user(id):
 
 
 class User(UserMixin, Document):
-    if MONGODB_AVAILABLE:
-        meta = {"collection": "users"}
+    meta = {"collection": "users"}
 
     username = StringField(max_length=64, unique=True, required=True)
     email = StringField(max_length=120, unique=True, required=True)
@@ -66,8 +34,7 @@ class User(UserMixin, Document):
 
 
 class Task(Document):
-    if MONGODB_AVAILABLE:
-        meta = {"collection": "tasks"}
+    meta = {"collection": "tasks"}
     title = StringField(max_length=100, required=True)
     description = StringField()
     status = StringField(max_length=20, default="To Do")  # To Do, In Progress, Completed
