@@ -149,7 +149,10 @@ jobs:
       contents: read
       id-token: write
     env:
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
     
     steps:
     - uses: actions/checkout@v4
@@ -163,9 +166,9 @@ jobs:
         echo "Client Secret length: ${#AZURE_CLIENT_SECRET}"
         
         echo "Logging in with service principal..."
-        az login --service-principal --username "${{ secrets.AZURE_CLIENT_ID }}" --password "${{ secrets.AZURE_CLIENT_SECRET }}" --tenant "${{ secrets.AZURE_TENANT_ID }}"
+        az login --service-principal --username "$AZURE_CLIENT_ID" --password "$AZURE_CLIENT_SECRET" --tenant "$AZURE_TENANT_ID"
         echo "Setting subscription..."
-        az account set --subscription "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+        az account set --subscription "$AZURE_SUBSCRIPTION_ID"
         echo "Login successful!"
     
     - name: Test Azure Connection
