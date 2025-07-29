@@ -34,7 +34,6 @@ def create_app(config_class=Config):
 
         # Initialize Swagger API
         swagger_api.init_app(app)
-        
         logger.info("All blueprints registered successfully")
         app.logger.info("All blueprints registered successfully")
     except Exception as e:
