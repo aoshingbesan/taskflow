@@ -10,6 +10,7 @@ login_manager = LoginManager()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 # Create a dummy db object for imports
 class DummyDB:
     pass
