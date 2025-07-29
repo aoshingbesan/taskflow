@@ -6,25 +6,32 @@ from bson import ObjectId
 # Try to import MongoDB components, fall back to dummy classes if not available
 try:
     from mongoengine import Document, StringField, DateTimeField, ReferenceField, ObjectIdField
+
     MONGODB_AVAILABLE = True
 except ImportError:
     MONGODB_AVAILABLE = False
+
     # Create dummy classes
     class Document:
         def __init__(self, **kwargs):
             pass
+
     class StringField:
         def __init__(self, **kwargs):
             pass
+
     class DateTimeField:
         def __init__(self, **kwargs):
             pass
+
     class ReferenceField:
         def __init__(self, **kwargs):
             pass
+
     class ObjectIdField:
         def __init__(self, **kwargs):
             pass
+
 
 from app import db, login_manager
 
