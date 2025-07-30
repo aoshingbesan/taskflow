@@ -30,22 +30,9 @@ Go to your GitHub repository → **Settings** → **Secrets and variables** → 
 
 ### **2. AZURE_WEBAPP_PUBLISH_PROFILE_STAGING**
 **Name:** `AZURE_WEBAPP_PUBLISH_PROFILE_STAGING`
-**Value:** (Copy the entire JSON below)
-```json
-{
-  "SQLServerDBConnectionString": "",
-  "controlPanelLink": "https://portal.azure.com",
-  "databases": null,
-  "destinationAppUrl": "http://taskflow-staging.azurewebsites.net",
-  "hostingProviderForumLink": "",
-  "msdeploySite": "taskflow-staging",
-  "profileName": "taskflow-staging - Web Deploy",
-  "publishMethod": "MSDeploy",
-  "publishUrl": "taskflow-staging.scm.azurewebsites.net:443",
-  "userName": "$taskflow-staging",
-  "userPWD": "Q5ggHzN3yfsimljBpuKZnodEAGX7MmZyqxL06qog7mpHb6wXgh1lkXQysdtq",
-  "webSystem": "WebSites"
-}
+**Value:** (Copy the entire XML below)
+```xml
+<publishData><publishProfile profileName="taskflow-staging - Web Deploy" publishMethod="MSDeploy" publishUrl="taskflow-staging.scm.azurewebsites.net:443" msdeploySite="taskflow-staging" userName="$taskflow-staging" userPWD="Q5ggHzN3yfsimljBpuKZnodEAGX7MmZyqxL06qog7mpHb6wXgh1lkXQysdtq" destinationAppUrl="http://taskflow-staging.azurewebsites.net" SQLServerDBConnectionString="" mySQLDBConnectionString="" hostingProviderForumLink="" controlPanelLink="https://portal.azure.com" webSystem="WebSites"><databases /></publishProfile><publishProfile profileName="taskflow-staging - FTP" publishMethod="FTP" publishUrl="ftps://waws-prod-blu-125.ftp.azurewebsites.windows.net/site/wwwroot" ftpPassiveMode="True" userName="taskflow-staging\$taskflow-staging" userPWD="Q5ggHzN3yfsimljBpuKZnodEAGX7MmZyqxL06qog7mpHb6wXgh1lkXQysdtq" destinationAppUrl="http://taskflow-staging.azurewebsites.net" SQLServerDBConnectionString="" mySQLDBConnectionString="" hostingProviderForumLink="" controlPanelLink="https://portal.azure.com" webSystem="WebSites"><databases /></publishProfile><publishProfile profileName="taskflow-staging - Zip Deploy" publishMethod="ZipDeploy" publishUrl="taskflow-staging.scm.azurewebsites.net:443" userName="$taskflow-staging" userPWD="Q5ggHzN3yfsimljBpuKZnodEAGX7MmZyqxL06qog7mpHb6wXgh1lkXQysdtq" destinationAppUrl="http://taskflow-staging.azurewebsites.net" SQLServerDBConnectionString="" mySQLDBConnectionString="" hostingProviderForumLink="" controlPanelLink="https://portal.azure.com" webSystem="WebSites"><databases /></publishProfile><publishProfile profileName="taskflow-staging - ReadOnly - FTP" publishMethod="FTP" publishUrl="ftps://waws-prod-blu-125dr.ftp.azurewebsites.windows.net/site/wwwroot" ftpPassiveMode="True" userName="taskflow-staging\$taskflow-staging" userPWD="Q5ggHzN3yfsimljBpuKZnodEAGX7MmZyqxL06qog7mpHb6wXgh1lkXQysdtq" destinationAppUrl="http://taskflow-staging.azurewebsites.net" SQLServerDBConnectionString="" mySQLDBConnectionString="" hostingProviderForumLink="" controlPanelLink="https://portal.azure.com" webSystem="WebSites"><databases /></publishProfile></publishData>
 ```
 
 ### **3. AZURE_WEBAPP_PUBLISH_PROFILE**
@@ -59,12 +46,11 @@ Go to your GitHub repository → **Settings** → **Secrets and variables** → 
 
 ### **Step 1: Test Staging Deployment**
 ```bash
-# Create develop branch if it doesn't exist
-git checkout -b develop
-git push origin develop
+# Make sure you're on develop branch
+git checkout develop
 
 # Make a test change
-echo "# Test deployment" >> README.md
+echo "# Test deployment - $(date)" >> README.md
 git add README.md
 git commit -m "Test staging deployment"
 git push origin develop
