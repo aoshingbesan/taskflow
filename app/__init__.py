@@ -22,7 +22,7 @@ def create_app():
 
     # Configure Application Insights middleware
     if app_insights_connection_string:
-        FlaskMiddleware(app, connection_string=app_insights_connection_string)
+        FlaskMiddleware(app)
         logger.info("Application Insights middleware configured")
 
     # Configuration
