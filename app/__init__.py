@@ -52,21 +52,24 @@ def create_app():
     from app.routes.main import main_bp
     from app.routes.tasks import tasks_bp
     from app.routes.api import api_bp
-    from app.routes.swagger_api import swagger_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(tasks_bp)
     app.register_blueprint(api_bp)
-    app.register_blueprint(swagger_bp)
+
+    # Initialize Swagger API
+    from app.routes.swagger_api import init_app as init_swagger
+    init_swagger(app)
 
     # User loader for Flask-Login
     from app.models import User
+    from bson import ObjectId
 
     @login_manager.user_loader
     def load_user(user_id):
         try:
-            return User.objects.get(id=user_id)
+            return User.objects(id=ObjectId(user_id)).first()
         except:
             return None
 

@@ -4,16 +4,6 @@ from flask_login import UserMixin
 from mongoengine import Document, StringField, DateTimeField, ReferenceField, ObjectIdField
 from bson import ObjectId
 
-from app import db, login_manager
-
-
-@login_manager.user_loader
-def load_user(id):
-    try:
-        return User.objects(id=ObjectId(id)).first()
-    except:
-        return None
-
 
 class User(UserMixin, Document):
     meta = {"collection": "users"}
