@@ -60,6 +60,7 @@ def create_app():
 
     # Initialize Swagger API
     from app.routes.swagger_api import init_app as init_swagger
+
     init_swagger(app)
 
     # User loader for Flask-Login
