@@ -170,14 +170,14 @@ jobs:
     - name: Deploy to Azure App Service (Staging)
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'taskflow-staging-new'
+        app-name: 'taskflow-staging'
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_STAGING }}
         package: .
     
     - name: Health Check Staging
       run: |
         sleep 30
-        curl -f https://taskflow-staging-new.azurewebsites.net/health || exit 1
+        curl -f https://taskflow-staging.azurewebsites.net/health || exit 1
 
   # Staging Monitoring
   staging-monitoring:
@@ -189,7 +189,7 @@ jobs:
     - name: Check Staging Health
       run: |
         echo "Checking staging health..."
-        STAGING_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://taskflow-staging-new.azurewebsites.net/health)
+        STAGING_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://taskflow-staging.azurewebsites.net/health)
         echo "Staging status: $STAGING_STATUS"
         
         if [ "$STAGING_STATUS" != "200" ]; then
