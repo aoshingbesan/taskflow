@@ -1,0 +1,37 @@
+[
+  {
+    "name": "WEBSITES_PORT",
+    "slotSetting": false,
+    "value": "8000"
+  },
+  {
+    "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+    "slotSetting": false,
+    "value": "true"
+  },
+  {
+    "name": "PYTHONPATH",
+    "slotSetting": false,
+    "value": "/home/site/wwwroot"
+  },
+  {
+    "name": "SECRET_KEY",
+    "slotSetting": false,
+    "value": "your-super-secret-key-change-this-in-production"
+  },
+  {
+    "name": "FLASK_ENV",
+    "slotSetting": false,
+    "value": "production"
+  },
+  {
+    "name": "FLASK_APP",
+    "slotSetting": false,
+    "value": "main_app.py"
+  },
+  {
+    "name": "MONGODB_URI",
+    "slotSetting": false,
+    "value": "mongodb+srv://aoshingbes:bWcxHfCJdXLSzOhg@taskflow.onmvorc.mongodb.net/taskflow?retryWrites=true&w=majority&appName=taskflow"
+  }
+]
