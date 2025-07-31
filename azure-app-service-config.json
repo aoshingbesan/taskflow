@@ -1,0 +1,42 @@
+{
+  "name": "taskflow-app",
+  "resourceGroup": "taskflow-rg",
+  "location": "East US",
+  "runtime": {
+    "name": "python",
+    "version": "3.11"
+  },
+  "configuration": {
+    "appSettings": [
+      {
+        "name": "WEBSITES_PORT",
+        "value": "8000"
+      },
+      {
+        "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+        "value": "true"
+      },
+      {
+        "name": "PYTHONPATH",
+        "value": "/home/site/wwwroot"
+      },
+      {
+        "name": "SECRET_KEY",
+        "value": "your-super-secret-key-change-this-in-production"
+      },
+      {
+        "name": "FLASK_ENV",
+        "value": "production"
+      },
+      {
+        "name": "FLASK_APP",
+        "value": "main_app.py"
+      }
+    ],
+    "startupCommand": "python -m pip install --upgrade pip && pip install -r requirements.txt && gunicorn --bind=0.0.0.0:8000 --timeout=600 --workers=2 main_app:app"
+  },
+  "deployment": {
+    "method": "zip",
+    "source": "local"
+  }
+} 
