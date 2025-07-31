@@ -1,1 +1,1 @@
-pip install -r requirements.txt && gunicorn --bind=0.0.0.0:8000 --timeout=600 main_app:app 
+python -m pip install --upgrade pip && pip install -r requirements.txt && gunicorn --bind=0.0.0.0:8000 --timeout=600 --workers=2 main_app:app 
