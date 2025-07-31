@@ -169,13 +169,13 @@ jobs:
     - name: Restart App Service (Fix Deployment Conflicts)
       run: |
         echo "Restarting App Service to resolve deployment conflicts..."
-        az webapp restart --resource-group taskflow-rg --name taskflow-staging
+        az webapp restart --resource-group taskflow-rg --name taskflow-staging-new
         sleep 30
     
     - name: Deploy to Azure App Service (Staging)
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'taskflow-staging'
+        app-name: 'taskflow-staging-new'
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_STAGING }}
         package: .
       continue-on-error: true
@@ -184,7 +184,7 @@ jobs:
       if: failure()
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'taskflow-staging'
+        app-name: 'taskflow-staging-new'
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_STAGING }}
         package: .
     
@@ -196,7 +196,7 @@ jobs:
         echo "Testing health endpoint..."
         for i in {1..10}; do
           echo "Health check attempt $i/10..."
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://taskflow-staging.azurewebsites.net/health)
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://taskflow-staging-new.azurewebsites.net/health)
           
           if [ "$HTTP_STATUS" = "200" ]; then
             echo "✅ Health check passed!"
@@ -222,7 +222,7 @@ jobs:
     - name: Check Staging Health
       run: |
         echo "Checking staging health..."
-        STAGING_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://taskflow-staging.azurewebsites.net/health)
+        STAGING_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://taskflow-staging-new.azurewebsites.net/health)
         echo "Staging status: $STAGING_STATUS"
         
         if [ "$STAGING_STATUS" != "200" ]; then
