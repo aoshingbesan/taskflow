@@ -24,10 +24,7 @@ def create_app():
     if app.config["MONGODB_URI"]:
         try:
             mongoengine.connect(
-                host=app.config["MONGODB_URI"], 
-                serverSelectionTimeoutMS=5000, 
-                connectTimeoutMS=5000, 
-                socketTimeoutMS=5000
+                host=app.config["MONGODB_URI"], serverSelectionTimeoutMS=5000, connectTimeoutMS=5000, socketTimeoutMS=5000
             )
             logger.info("MongoDB connection established")
         except Exception as e:
