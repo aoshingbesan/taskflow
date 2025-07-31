@@ -235,7 +235,7 @@ jobs:
         echo "Production status: $PROD_STATUS"
         
         echo "Checking staging health..."
-        STAGING_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://taskflow-staging.azurewebsites.net/health)
+        STAGING_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://taskflow-staging-new.azurewebsites.net/health)
         echo "Staging status: $STAGING_STATUS"
         
         if [ "$PROD_STATUS" != "200" ] || [ "$STAGING_STATUS" != "200" ]; then
