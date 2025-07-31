@@ -76,10 +76,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Input validation and sanitization
 
 ### Deployment URLs
-- **Production**: https://taskflow-app.azurewebsites.net
-- **Staging**: https://taskflow-staging.azurewebsites.net
-- **API Documentation**: https://taskflow-app.azurewebsites.net/docs
-- **Health Check**: https://taskflow-app.azurewebsites.net/health
+- **Production**: https://taskflow-app-new.azurewebsites.net
+- **Staging**: https://taskflow-staging-new.azurewebsites.net
+- **API Documentation**: https://taskflow-app-new.azurewebsites.net/docs
+- **Health Check**: https://taskflow-app-new.azurewebsites.net/health
+
+## [1.1.0] - 2025-07-31
+
+### Fixed
+- **Authentication System**: Fixed MongoDB connection and auth routes
+- **Azure Deployment**: Updated app names and configuration
+- **CI/CD Pipeline**: Fixed workflow references to deleted files
+- **Code Formatting**: Resolved Black formatting issues
+- **Monitoring**: Fixed staging URL in production monitoring workflow
+
+### Added
+- **MongoDB Configuration**: Added MongoDB URI to Azure App Service
+- **Auth Route Prefix**: Fixed URL prefix for authentication routes
+- **Enhanced Monitoring**: Improved health checks and error handling
+- **Documentation**: Updated README with working URLs and comprehensive API docs
+
+### Technical Improvements
+- **MongoDB Timeouts**: Increased connection timeouts to 30 seconds
+- **Port Configuration**: Proper port handling for Azure App Service
+- **Startup Commands**: Updated gunicorn configuration
+- **Environment Variables**: Complete Azure App Service configuration
+
+### Deployment Status
+- **Production**: ✅ Fully operational at https://taskflow-app-new.azurewebsites.net
+- **Staging**: ✅ Fully operational at https://taskflow-staging-new.azurewebsites.net
+- **Authentication**: ✅ User registration and login working
+- **API Documentation**: ✅ Swagger docs available at /docs
+- **Health Monitoring**: ✅ Real-time health checks operational
 
 ## [0.9.0] - 2025-07-29
 
@@ -165,6 +193,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Release Notes
 
+### Version 1.1.0 - Authentication & Deployment Fixes
+This release resolves critical authentication and deployment issues, ensuring full functionality of the TaskFlow application.
+
+**Key Fixes:**
+- Fixed MongoDB connection and authentication system
+- Updated Azure deployment configuration
+- Resolved CI/CD pipeline issues
+- Enhanced monitoring and health checks
+
+**Deployment Status:**
+- ✅ Production: https://taskflow-app-new.azurewebsites.net
+- ✅ Staging: https://taskflow-staging-new.azurewebsites.net
+- ✅ Authentication: User registration and login working
+- ✅ API Documentation: Swagger docs available
+- ✅ Health Monitoring: Real-time checks operational
+
 ### Version 1.0.0 - Production Release
 This is the first production release of TaskFlow, featuring a complete task management application with full DevOps pipeline, monitoring, and security integration.
 
@@ -176,8 +220,8 @@ This is the first production release of TaskFlow, featuring a complete task mana
 - MongoDB Atlas database integration
 
 **Deployment Status:**
-- ✅ Production: https://taskflow-app.azurewebsites.net
-- ✅ Staging: https://taskflow-staging.azurewebsites.net
+- ✅ Production: https://taskflow-app-new.azurewebsites.net
+- ✅ Staging: https://taskflow-staging-new.azurewebsites.net
 - ✅ All features functional and tested
 - ✅ Monitoring and observability configured
 - ✅ Security scanning integrated
