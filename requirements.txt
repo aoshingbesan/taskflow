@@ -22,6 +22,6 @@ bleach>=6.1.0
 # Azure App Service compatibility
 wfastcgi>=3.0.0
 
-# Azure Application Insights for monitoring
-opencensus-ext-azure>=1.1.8
-opencensus-ext-flask>=0.1.0 
+# Azure Application Insights for monitoring (commented out for stability)
+# opencensus-ext-azure>=1.1.8
+# opencensus-ext-flask>=0.1.0 

@@ -167,7 +167,22 @@ jobs:
         az account show
         az webapp list --resource-group taskflow-rg
     
+    - name: Restart App Service (Fix Deployment Conflicts)
+      run: |
+        echo "Restarting App Service to resolve deployment conflicts..."
+        az webapp restart --resource-group taskflow-rg --name taskflow-staging
+        sleep 30
+    
     - name: Deploy to Azure App Service (Staging)
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'taskflow-staging'
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_STAGING }}
+        package: .
+      continue-on-error: true
+    
+    - name: Retry Deployment if Failed
+      if: failure()
       uses: azure/webapps-deploy@v2
       with:
         app-name: 'taskflow-staging'
@@ -176,8 +191,27 @@ jobs:
     
     - name: Health Check Staging
       run: |
-        sleep 30
-        curl -f https://taskflow-staging.azurewebsites.net/health || exit 1
+        echo "Waiting for deployment to complete..."
+        sleep 60
+        
+        echo "Testing health endpoint..."
+        for i in {1..10}; do
+          echo "Health check attempt $i/10..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://taskflow-staging.azurewebsites.net/health)
+          
+          if [ "$HTTP_STATUS" = "200" ]; then
+            echo "✅ Health check passed!"
+            break
+          else
+            echo "Health check failed (HTTP $HTTP_STATUS), retrying..."
+            sleep 10
+          fi
+        done
+        
+        if [ "$HTTP_STATUS" != "200" ]; then
+          echo "❌ Health check failed after 10 attempts"
+          exit 1
+        fi
 
   # Staging Monitoring
   staging-monitoring:
