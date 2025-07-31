@@ -78,3 +78,4 @@ MIT License
 # Staging deployment test
 
 trigger trigger# Trigger Docker rebuild - Thu Jul 31 17:28:45 CAT 2025
+# Force Azure rebuild - Thu Jul 31 17:47:00 CAT 2025
