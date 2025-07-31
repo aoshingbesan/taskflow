@@ -3,27 +3,13 @@ import logging
 from flask import Flask
 from flask_login import LoginManager
 import mongoengine
-from opencensus.ext.azure.log_exporter import AzureLogHandler
-from opencensus.ext.flask.flask_middleware import FlaskMiddleware
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Add Azure Application Insights logging if connection string is available
-app_insights_connection_string = os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
-if app_insights_connection_string:
-    logger.addHandler(AzureLogHandler(connection_string=app_insights_connection_string))
-    logger.info("Application Insights logging configured")
-
-
 def create_app():
     app = Flask(__name__)
-
-    # Configure Application Insights middleware
-    if app_insights_connection_string:
-        FlaskMiddleware(app, connection_string=app_insights_connection_string)
-        logger.info("Application Insights middleware configured")
 
     # Configuration
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "your-super-secret-key-change-this")
@@ -34,11 +20,14 @@ def create_app():
     login_manager.init_app(app)
     login_manager.login_view = "auth.login"
 
-    # MongoDB connection
+    # MongoDB connection (optional)
     if app.config["MONGODB_URI"]:
         try:
             mongoengine.connect(
-                host=app.config["MONGODB_URI"], serverSelectionTimeoutMS=5000, connectTimeoutMS=5000, socketTimeoutMS=5000
+                host=app.config["MONGODB_URI"], 
+                serverSelectionTimeoutMS=5000, 
+                connectTimeoutMS=5000, 
+                socketTimeoutMS=5000
             )
             logger.info("MongoDB connection established")
         except Exception as e:
@@ -48,31 +37,42 @@ def create_app():
         logger.info("MongoDB connection skipped - no URI provided")
 
     # Import and register blueprints
-    from app.routes.auth import auth_bp
-    from app.routes.main import main_bp
-    from app.routes.tasks import tasks_bp
-    from app.routes.api import api_bp
+    try:
+        from app.routes.auth import auth_bp
+        from app.routes.main import main_bp
+        from app.routes.tasks import tasks_bp
+        from app.routes.api import api_bp
 
-    app.register_blueprint(auth_bp)
-    app.register_blueprint(main_bp)
-    app.register_blueprint(tasks_bp)
-    app.register_blueprint(api_bp)
+        app.register_blueprint(auth_bp)
+        app.register_blueprint(main_bp)
+        app.register_blueprint(tasks_bp)
+        app.register_blueprint(api_bp)
+        logger.info("All blueprints registered successfully")
+    except Exception as e:
+        logger.error(f"Error registering blueprints: {e}")
 
     # Initialize Swagger API
-    from app.routes.swagger_api import init_app as init_swagger
-
-    init_swagger(app)
+    try:
+        from app.routes.swagger_api import init_app as init_swagger
+        init_swagger(app)
+        logger.info("Swagger API initialized")
+    except Exception as e:
+        logger.error(f"Error initializing Swagger: {e}")
 
     # User loader for Flask-Login
-    from app.models import User
-    from bson import ObjectId
+    try:
+        from app.models import User
+        from bson import ObjectId
 
-    @login_manager.user_loader
-    def load_user(user_id):
-        try:
-            return User.objects(id=ObjectId(user_id)).first()
-        except:
-            return None
+        @login_manager.user_loader
+        def load_user(user_id):
+            try:
+                return User.objects(id=ObjectId(user_id)).first()
+            except:
+                return None
+        logger.info("User loader configured")
+    except Exception as e:
+        logger.error(f"Error configuring user loader: {e}")
 
     logger.info("TaskFlow application initialized successfully")
     return app
