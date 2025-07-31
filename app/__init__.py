@@ -8,6 +8,7 @@ import mongoengine
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 def create_app():
     app = Flask(__name__)
 
@@ -51,6 +52,7 @@ def create_app():
     # Initialize Swagger API
     try:
         from app.routes.swagger_api import init_app as init_swagger
+
         init_swagger(app)
         logger.info("Swagger API initialized")
     except Exception as e:
@@ -67,6 +69,7 @@ def create_app():
                 return User.objects(id=ObjectId(user_id)).first()
             except:
                 return None
+
         logger.info("User loader configured")
     except Exception as e:
         logger.error(f"Error configuring user loader: {e}")
