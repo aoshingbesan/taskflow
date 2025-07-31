@@ -1,1 +1,1 @@
-python -m pip install --user -r requirements.txt && gunicorn --bind=0.0.0.0:$PORT --timeout 600 --workers=2 main_app:app 
+gunicorn --bind=0.0.0.0:$PORT --timeout 600 --workers=1 --max-requests=1000 --max-requests-jitter=100 main_app:app 
