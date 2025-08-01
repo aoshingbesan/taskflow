@@ -26,7 +26,7 @@ def create_app():
         import time
         from mongoengine.connection import get_db
         
-        # Optimize connection string for Azure App Service
+                # Optimize connection string for Azure App Service
         connection_string = app.config["MONGODB_URI"]
         if "?" in connection_string:
             connection_string += (
@@ -36,7 +36,6 @@ def create_app():
             connection_string += (
                 "?maxPoolSize=20&minPoolSize=5&maxIdleTimeMS=60000&serverSelectionTimeoutMS=30000&connectTimeoutMS=10000"
             )
-        
         # Implement connection retry logic
         max_retries = 3
         for attempt in range(max_retries):

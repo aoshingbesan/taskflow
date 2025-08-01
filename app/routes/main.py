@@ -19,21 +19,19 @@ def health():
     import os
     import mongoengine
     
-    health_status = {
+        health_status = {
         "status": "healthy",
         "timestamp": datetime.utcnow().isoformat(),
         "version": os.environ.get("APP_VERSION", "1.0"),
         "checks": {},
     }
-    
     try:
         # Test database connectivity
         if mongoengine.connection.get_db():
             health_status["checks"]["database"] = {"status": "healthy"}
-        else:
+                else:
             health_status["checks"]["database"] = {"status": "unhealthy", "error": "No database connection"}
             health_status["status"] = "unhealthy"
-        
         # Check resource usage (if available)
         try:
             import psutil
@@ -46,9 +44,8 @@ def health():
                 "memory_percent": memory_percent,
                 "status": "healthy" if cpu_percent < 80 and memory_percent < 85 else "warning",
             }
-        except ImportError:
+                except ImportError:
             health_status["checks"]["resources"] = {"status": "not_available"}
-        
         # Check environment variables
         health_status["checks"]["environment"] = {
             "mongodb_uri_set": bool(os.environ.get("MONGODB_URI")),
