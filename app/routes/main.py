@@ -27,10 +27,15 @@ def health():
     }
     try:
         # Test database connectivity
-        if mongoengine.connection.get_db():
-            health_status["checks"]["database"] = {"status": "healthy"}
-        else:
-            health_status["checks"]["database"] = {"status": "unhealthy", "error": "No database connection"}
+        try:
+            db = mongoengine.connection.get_db()
+            if db is not None:
+                health_status["checks"]["database"] = {"status": "healthy"}
+            else:
+                health_status["checks"]["database"] = {"status": "unhealthy", "error": "No database connection"}
+                health_status["status"] = "unhealthy"
+        except Exception as db_error:
+            health_status["checks"]["database"] = {"status": "unhealthy", "error": str(db_error)}
             health_status["status"] = "unhealthy"
         # Check resource usage (if available)
         try:
