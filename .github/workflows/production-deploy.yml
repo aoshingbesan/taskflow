@@ -13,7 +13,6 @@ jobs:
   deploy-production:
     runs-on: ubuntu-latest
     environment: production  # This requires manual approval in GitHub settings
-    timeout-minutes: 20
 
     steps:
       - name: Checkout code

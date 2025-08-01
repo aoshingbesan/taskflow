@@ -13,7 +13,6 @@ jobs:
   deploy-staging:
     runs-on: ubuntu-latest
     environment: staging
-    timeout-minutes: 20
 
     steps:
       - name: Checkout code
@@ -79,7 +78,6 @@ jobs:
           app-name: 'taskflow-staging-new'
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_STAGING }}
           package: staging-deploy.zip
-        timeout-minutes: 10
 
       - name: Verify Staging Deployment
         run: |
