@@ -28,10 +28,14 @@ def create_app():
         
         # Optimize connection string for Azure App Service
         connection_string = app.config["MONGODB_URI"]
-        if '?' in connection_string:
-            connection_string += '&maxPoolSize=20&minPoolSize=5&maxIdleTimeMS=60000&serverSelectionTimeoutMS=30000&connectTimeoutMS=10000'
+        if "?" in connection_string:
+            connection_string += (
+                "&maxPoolSize=20&minPoolSize=5&maxIdleTimeMS=60000&serverSelectionTimeoutMS=30000&connectTimeoutMS=10000"
+            )
         else:
-            connection_string += '?maxPoolSize=20&minPoolSize=5&maxIdleTimeMS=60000&serverSelectionTimeoutMS=30000&connectTimeoutMS=10000'
+            connection_string += (
+                "?maxPoolSize=20&minPoolSize=5&maxIdleTimeMS=60000&serverSelectionTimeoutMS=30000&connectTimeoutMS=10000"
+            )
         
         # Implement connection retry logic
         max_retries = 3
@@ -51,7 +55,7 @@ def create_app():
                     logger.error(f"Failed to connect to MongoDB after {max_retries} attempts")
                     logger.info("MongoDB connection skipped - continuing without database")
                 else:
-                    time.sleep(2 ** attempt)  # Exponential backoff
+                    time.sleep(2**attempt)  # Exponential backoff
     else:
         logger.info("MongoDB connection skipped - no URI provided")
 
