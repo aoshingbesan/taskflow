@@ -2,6 +2,12 @@
 
 A Flask-based web application for personal task management with user authentication, task CRUD operations, and RESTful API. Built with modern DevSecOps practices including CI/CD pipelines, security scanning, and comprehensive monitoring.
 
+## 🎬 Demo
+
+> Add your demo video or walkthrough link here.
+
+[![Watch Demo](https://youtu.be/27XzDbqghns)
+
 ## 🚀 Live Application
 
 ### ✅ Production Environment
