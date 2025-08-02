@@ -6,7 +6,9 @@ A Flask-based web application for personal task management with user authenticat
 
 > Add your demo video or walkthrough link here.
 
-[![Watch Demo](https://youtu.be/27XzDbqghns)
+[![Watch Demo](https://img.shields.io/badge/Watch-Demo-blue)](https://www.youtube.com/watch?v=27XzDbqghns)
+
+---
 
 ## 🚀 Live Application
 
